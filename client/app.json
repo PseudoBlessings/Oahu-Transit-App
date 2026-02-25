@@ -40,7 +40,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -49,8 +50,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "a9cab0a8-a957-4a2b-92ad-2aafcf8c310d"
+        "projectId": "3677ce1d-c48b-4773-8cab-de27896fe4c9"
       }
-    }
+    },
+    "owner": "pseudoblessing"
   }
 }
