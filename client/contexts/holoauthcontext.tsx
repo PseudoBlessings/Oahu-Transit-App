@@ -1,4 +1,4 @@
-import {createContext, PropsWithChildren, useState } from "react";
+import {createContext, PropsWithChildren, useState, useRef } from "react";
 import { Modal, TouchableOpacity, View, Text } from "react-native";
 import{WebView} from "react-native-webview"
 
@@ -6,6 +6,7 @@ export const HoloContext = createContext<any>(null);
 
 export default function HoloAuthProvider({ children }: PropsWithChildren) {
     const [session, setSession] = useState<any>(null);
+    const webViewRef = useRef<WebView>(null);
 
     return (
         <HoloContext.Provider value={{ session, setSession }}>
@@ -19,8 +20,21 @@ export default function HoloAuthProvider({ children }: PropsWithChildren) {
                     <View className="flex-1">
                         <WebView
                             className="flex-1"
-                            source={{ uri: "https://www.holocard.net" }}
-                            // onMessage={...} 
+                            ref={webViewRef}
+                            source={{ uri: "https://www.holocard.net/en/sign-in/" }}
+                            onNavigationStateChange={(NavState)=>{
+                                const url:string = NavState.url
+                                if(url.includes("/customeraccount/my-cards/")){
+                                    webViewRef.current?.injectJavaScript(`
+                                        window.ReactNativeWebView.postMessage(document.cookie);
+                                        true;`
+                                    )
+                                }
+                            }}
+                            onMessage={(event)=>{
+                                console.log("Captured Cookies:", event.nativeEvent.data);
+                                setSession(event.nativeEvent.data);
+                            }}
                         />
                     </View>
                 </Modal>
