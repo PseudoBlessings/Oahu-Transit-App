@@ -1,5 +1,5 @@
 import {createContext, PropsWithChildren, useState } from "react";
-import { Modal, View } from "react-native";
+import { Modal, TouchableOpacity, View, Text } from "react-native";
 import{WebView} from "react-native-webview"
 
 export const HoloContext = createContext<any>(null);
@@ -9,16 +9,22 @@ export default function HoloAuthProvider({ children }: PropsWithChildren) {
 
     return (
         <HoloContext.Provider value={{ session, setSession }}>
-            <Modal visible={!session} animationType="slide" style={{height: 100, width:100}}>
-                <View className="flex-1" style={{flex:1}}>
-                    <WebView
-                        className="flex-1"
-                        style={{flex:1}}
-                        source={{ uri: "https://www.holocard.net" }}
-                        // onMessage={...} 
-                    />
-                </View>
-            </Modal>
+            <View>
+                <Modal visible={!session} animationType="slide">
+                    <View className="h-12 w-full flex-row items-center justify-end px-4 bg-gray-200">
+                        <TouchableOpacity onPress={() => setSession({})}>
+                            <Text className="text-lg font-bold">✕</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View className="flex-1">
+                        <WebView
+                            className="flex-1"
+                            source={{ uri: "https://www.holocard.net" }}
+                            // onMessage={...} 
+                        />
+                    </View>
+                </Modal>
+            </View>
             {children}
         </HoloContext.Provider>
     );
