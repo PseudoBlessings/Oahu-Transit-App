@@ -1,11 +1,15 @@
+import { useContext } from "react";
 import { Text, View } from "react-native";
+import { HoloContext } from "@/contexts/holoauthcontext";
 
 export default function Index() {
+  const { session, setSession, holoAccessGranted } = useContext(HoloContext)
   return (
     <View
-      className="flex:1 justify-center items-center"
+      className="flex-1 justify-center items-center"
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      {holoAccessGranted? <><Text>Here is the session:</Text>
+      <Text>{JSON.stringify(session)}</Text></> : <Text>You Denied Access</Text>}
     </View>
   );
 }
