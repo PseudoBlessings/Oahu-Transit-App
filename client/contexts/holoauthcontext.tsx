@@ -8,13 +8,14 @@ export const HoloContext = createContext<any>(null);
 export default function HoloAuthProvider({ children }: PropsWithChildren) {
     const [session, setSession] = useState<any>(null);
     const webViewRef = useRef<WebView>(null);
+    const [holoAccessGranted, setHoloAccessGranted] = useState<boolean>(true);
 
     return (
-        <HoloContext.Provider value={{ session, setSession }}>
+        <HoloContext.Provider value={{ session, setSession, holoAccessGranted, setHoloAccessGranted }}>
             <View>
-                <Modal visible={!session} animationType="slide" allowSwipeDismissal={true}>
+                <Modal visible={(!session && holoAccessGranted)} animationType="slide" allowSwipeDismissal={true}>
                     <View className="h-12 w-full flex-row items-center justify-end px-4 bg-gray-200">
-                        <TouchableOpacity onPress={() => setSession({})}>
+                        <TouchableOpacity onPress={() => setHoloAccessGranted(false)}>
                             <Ionicons name="exit-outline" size={24} color="black" />
                         </TouchableOpacity>
                     </View>

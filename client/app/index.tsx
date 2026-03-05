@@ -3,13 +3,13 @@ import { Text, View } from "react-native";
 import { HoloContext } from "@/contexts/holoauthcontext";
 
 export default function Index() {
-  const { session, setSession } = useContext(HoloContext)
+  const { session, setSession, holoAccessGranted } = useContext(HoloContext)
   return (
     <View
       className="flex-1 justify-center items-center"
     >
-      <Text>Here is the session:</Text>
-      <Text>{JSON.stringify(session)}</Text>
+      {holoAccessGranted? <><Text>Here is the session:</Text>
+      <Text>{JSON.stringify(session)}</Text></> : <Text>You Denied Access</Text>}
     </View>
   );
 }
