@@ -54,7 +54,7 @@ export function HolocardPreview({cardName, cardType, currentBalance, currentPass
                     <Text style={textStyles.h2}>Balance</Text>
                     <Text className="grow w-full text-center align-middle"
                         style={textStyles.h1}
-                    >${currentBalance}</Text>
+                    >${currentBalance/100}</Text>
                     
                 </View>
                 <View style={holocardPreviewStyle.column}>
