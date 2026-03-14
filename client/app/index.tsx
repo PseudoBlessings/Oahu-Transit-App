@@ -8,12 +8,12 @@ const DummyHoloCardPreview:HolocardPreviewInterface[] = [{cardName: "Z's Card", 
 
 
 export default function Index() {
-  const { session, setSession, holoAccessGranted } = useContext(HoloContext)
+  const { session, setSession, holoAccessGranted, cards } = useContext(HoloContext)
   return (
     <View
       className="flex-1"
     >
-      <HoloPocket holocardsPreviews={DummyHoloCardPreview}/>
+      <HoloPocket holocardsPreviews={cards}/>
     </View>
   );
 }
