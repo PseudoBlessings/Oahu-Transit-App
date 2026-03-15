@@ -47,11 +47,10 @@ export const cardStyles = StyleSheet.create(
     {
         card:{
             padding:scale(10),
-            flex: 1,
             borderRadius: scale(25),
             boxShadow: '0px 4px 75px 3px rgba(0, 0, 0, 0.25)',
-            width:'100%',
-            height:'100%',
+            width: '100%', 
+            alignSelf: 'flex-start',
             overflow:"hidden",
             
         }
