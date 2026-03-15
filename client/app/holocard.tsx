@@ -92,6 +92,15 @@ export default function Holocard(){
                     </View>
                 </View>
             </View>
+            {/**Card Activity Component*/}
+            <View className="flex flex-col">
+                <View className="flex-row justify-between">
+                    <Text className="text-white" style={[textStyles.h1, textStyles.bold]}>Card Activity</Text>
+                    <Pressable>
+                        <Text className="text-white" style={[textStyles.h1]}>See All</Text>
+                    </Pressable>
+                </View>
+            </View>
         </View>
     )
 } 
