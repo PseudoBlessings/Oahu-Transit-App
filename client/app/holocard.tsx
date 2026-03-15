@@ -21,7 +21,7 @@ export default function Holocard(){
         }
     }
     return(
-        <View className="flex-1 flex-col px-5 pt-3 pb-2" style={{backgroundColor:`${Colors.HoloSecondaryColor}`}}>
+        <View className="flex-1 flex-col px-5 pt-3 pb-2 gap-5" style={{backgroundColor:`${Colors.HoloSecondaryColor}`}}>
             {/**Holocard Info*/}
             <View className="self-stretch inline-flex flex-col justify-center items-center gap-2.5">
                 <Text style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(60, 0.6)}]} className="text-center justify-start text-white">Zviko's Holocard</Text>
@@ -33,49 +33,62 @@ export default function Holocard(){
                 <Text className="text-white" style={[textStyles.h1]}>Card Balance</Text>
                 <Text className="text-white" style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(96, 0.65)}]}>$15.00</Text>
                 {/**Monthly Pass Progress Component*/}
-                <View className="flex-col">
+                <View className="flex-col gap-2">
                     <Text className="text-white" style={[textStyles.h1]}>Month Pass • {today.toLocaleString('default', { month: 'long' })}</Text>
                     {/**Progress Bar Component*/}
                     <View className="flex">
                         <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({percentage:0.5})}}></View>
                         <View className="bg-white w-full h-2 absolute rounded-full"></View>
                     </View>
+                    {/**Cash Progress Component*/}
+                    <View className="flex flex-row justify-between">
+                        <Text className="text-white" style={[textStyles.h2]}>$40</Text>
+                        <Text className="text-white" style={[textStyles.h2]}>$80</Text>
+                    </View>
                 </View>
                 {/**Daily Pass Progress Component*/}
-                <View className="flex-col">
+                <View className="flex-col gap-2">
                     <Text className="text-white" style={[textStyles.h1]}>Daily Pass • {today.toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric'} )}</Text>
                     {/**Progress Bar Component*/}
                     <View className="flex">
                         <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({percentage:0.5})}}></View>
                         <View className="bg-white w-full h-2 absolute rounded-full"></View>
                     </View>
+                    {/**Cash Progress Component*/}
+                    <View className="flex flex-row justify-between">
+                        <Text className="text-white" style={[textStyles.h2]}>$4</Text>
+                        <Text className="text-white" style={[textStyles.h2]}>$8</Text>
+                    </View>
                 </View>
                 <Text className="text-white opacity-50" style={[textStyles.h1]}>Next Autoload February 18th $80</Text>
-                {/**Balance Actions*/}
+                {/**Balance Actions Componenet*/}
                 <View className="flex flex-row self-stretch justify-around items-center overflow-hidden">
-                    <View className="flex flex-col">
+                    {/**Autoload Action Componenet*/}
+                    <View className="flex flex-col justify-center items-center">
                         <Pressable>
                             <View className="bg-white rounded-[100px] inline-flex flex-col justify-center items-center aspect-square overflow-hidden">
                             <Foundation name="refresh" size={75} color="black" />
                             </View>
                         </Pressable>
-                        <Text>Autoload</Text>
+                        <Text className="text-white" style={[textStyles.h1]}>Autoload</Text>
                     </View>
+                    {/**Add Cash Action Componenet*/}
                     <View className="flex flex-col justify-center items-center">
                         <Pressable>
                             <View className="bg-white rounded-[100px] inline-flex flex-col justify-center items-center aspect-square overflow-hidden">
                             <MaterialCommunityIcons name="cash-plus" size={75} color="black" />
                             </View>
                         </Pressable>
-                        <Text>Add Cash</Text>
+                        <Text className="text-white" style={[textStyles.h1]}>Add Cash</Text>
                     </View>
+                    {/**Passes Action Componenet*/}
                     <View className="flex flex-col justify-center items-center">
                         <Pressable>
                             <View className="bg-white rounded-[100px] inline-flex flex-col justify-center items-center aspect-square overflow-hidden">
                             <Ionicons name="ticket-outline" size={75} color="black" />
                             </View>
                         </Pressable>
-                        <Text>Passes</Text>
+                        <Text className="text-white" style={[textStyles.h1]}>Passes</Text>
                     </View>
                 </View>
             </View>
