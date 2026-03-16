@@ -5,6 +5,7 @@ import Divider from "./divider";
 import Foundation from "@expo/vector-icons/Foundation";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 export interface HolocardPreviewProps{
     cardName:string;
@@ -25,6 +26,15 @@ export interface HolocardBalanceProps{
     totalSpentMonth: number;
     autoloadDate?: string;
     autoloadAmount?: number;
+}
+
+export interface HolocardCardActivityProps{
+    activityType: string;
+    activityName: string;
+    activityTimestamp: string;
+    activityDescription?:string;
+    activityCharge: number;
+    activityBalance: number;
 }
 
 const holocardPreviewStyle = StyleSheet.create({
@@ -196,4 +206,30 @@ export function HolocardBalance({currentBalance, totalSpentMonth, totalSpentToda
     )
 }
 
-export function CardActivitySection(){}
+export function CardActivitySection({activityBalance, activityCharge, activityName, activityTimestamp, activityType, activityDescription}:HolocardCardActivityProps){
+    return(
+        <View className="flex flex-col">
+                <View className="flex-row justify-between">
+                    <Text className="text-white" style={[textStyles.h1, textStyles.bold]}>Card Activity</Text>
+                    <Pressable>
+                        <Text className="text-white" style={[textStyles.h1]}>See All</Text>
+                    </Pressable>
+                </View>
+                {/**Card Activity Card Component*/}
+                <View className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
+                    <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+                    <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+                        <Text style={[textStyles.h1, textStyles.bold]}>{activityName}</Text>
+                        <Text style={[textStyles.h3, textStyles.bold]}>{activityTimestamp}</Text>
+                    </View>
+                    <View className="flex-1 flex-col justify-center items-start gap-2.5">
+                        <Text style={[textStyles.h3, textStyles.bold,]}>{activityDescription}</Text>
+                    </View>
+                    <View className="flex flex-col justify-start items-end gap-2.5">
+                        {activityCharge<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${(activityBalance/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>-${(activityBalance/100).toFixed(2)}</Text>}
+                        <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(activityBalance/100).toFixed(2)}</Text>
+                    </View>
+                </View>
+            </View>
+    )
+}
