@@ -1,8 +1,9 @@
-import { View, Text, Image, DimensionValue, Pressable, Button } from "react-native";
+import { View, Text, Image, DimensionValue, Pressable, Button, ScrollView } from "react-native";
 import { Colors, textStyles, moderateScale, cardStyles } from "@/components/style";
 import Foundation from '@expo/vector-icons/Foundation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function Holocard(){
     const today = new Date()
@@ -21,7 +22,7 @@ export default function Holocard(){
         }
     }
     return(
-        <View className="flex-1 flex-col px-5 pt-3 pb-2 gap-5" style={{backgroundColor:`${Colors.HoloSecondaryColor}`}}>
+        <ScrollView className="flex-1 flex-col px-5 pt-3 pb-2 gap-5" style={{backgroundColor:`${Colors.HoloSecondaryColor}`}}>
             {/**Holocard Info*/}
             <View className="self-stretch inline-flex flex-col justify-center items-center gap-2.5">
                 <Text style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(60, 0.6)}]} className="text-center justify-start text-white">Zviko's Holocard</Text>
@@ -100,7 +101,22 @@ export default function Holocard(){
                         <Text className="text-white" style={[textStyles.h1]}>See All</Text>
                     </Pressable>
                 </View>
+                {/**Card Activity Card Component*/}
+                <View className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
+                    <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+                    <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+                        <Text style={[textStyles.h1, textStyles.bold]}>Boarding</Text>
+                        <Text style={[textStyles.h3, textStyles.bold]}>12/18/2025 7:16 PM</Text>
+                    </View>
+                    <View className="flex-1 flex-col justify-center items-start gap-2.5">
+                        <Text style={[textStyles.h3, textStyles.bold,]}>Honolulu-Pearl City, Stop: MOANALUA RD + 98-1059</Text>
+                    </View>
+                    <View className="flex flex-col justify-start items-end gap-2.5">
+                        <Text style={[textStyles.h1]}>-$3.00</Text>
+                        <Text style={[textStyles.h3, textStyles.bold,]}>Balance: $17.00</Text>
+                    </View>
+                </View>
             </View>
-        </View>
+        </ScrollView>
     )
 } 
