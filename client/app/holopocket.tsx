@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 import {cardStyles, Colors} from "@/components/style"
-import { HolocardPreviewInterface, HolocardPreview } from "@/components/holocardcomponets";
+import { HolocardPreviewProps, HolocardPreview } from "@/components/holocardcomponets";
 import { Fragment, useContext, useEffect } from "react";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';

@@ -1,13 +1,19 @@
 import { useEffect } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { cardStyles, textStyles, scale } from "./style";
+import { cardStyles, textStyles, scale, moderateScale } from "./style";
 import Divider from "./divider";
 
-export interface HolocardPreviewInterface{
+export interface HolocardPreviewProps{
     cardName:string;
     cardType:string;
     currentBalance:number;
     currentPass:string;
+}
+
+export interface HolocardInfoProps{
+    cardName:string;
+    cardType:string;
+    physicalCardId:number|string;
 }
 
 const holocardPreviewStyle = StyleSheet.create({
@@ -21,12 +27,20 @@ const holocardPreviewStyle = StyleSheet.create({
     }
 })
 
-function getCardImage(cardType:string):string{
-    return ""
+
+function getCardImage(cardType?:string):string{
+    switch (cardType) {
+        case "Adult Card":
+            return "../assets/images/holo/adult.png"
+            break;
+        default:
+            return ""
+            break;
+    }
 }
 
 
-export function HolocardPreview({cardName, cardType, currentBalance, currentPass}:HolocardPreviewInterface){
+export function HolocardPreview({cardName, cardType, currentBalance, currentPass}:HolocardPreviewProps){
     useEffect(()=>{
         getCardImage(cardType)
     })
@@ -67,7 +81,21 @@ export function HolocardPreview({cardName, cardType, currentBalance, currentPass
     )
 }
 
-export function HolocardInfo(){}
+export function HolocardInfo({cardName, cardType, physicalCardId}:HolocardInfoProps){
+    const asset = Image.resolveAssetSource(require('../assets/images/holo/adult.png'));
+    const ratio = asset.width / asset.height;
+    {/**Holocard Info*/}
+            <View className="self-stretch inline-flex flex-col justify-center items-center gap-2.5">
+                <Text style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(60, 0.6)}]} className="text-center justify-start text-white">{cardName}</Text>
+                <Image 
+                    source={require(getCardImage(cardType))}
+                    resizeMode="contain"
+                    className="grow w-full"
+                    style={{height:scale(163)}}
+                    />
+                <Text style={[textStyles.h1, textStyles.bold]} className="text-center justify-start text-white">{physicalCardId}</Text>
+            </View>
+}
 
 export function HolocardBalance(){}
 
