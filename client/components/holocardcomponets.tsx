@@ -30,6 +30,7 @@ export interface HolocardBalanceProps{
 
 export interface HolocardCardActivityProps{
     activityType: string;
+    activityID:string;
     activityName: string;
     activityTimestamp: string;
     activityDescription?:string;
@@ -49,14 +50,12 @@ const holocardPreviewStyle = StyleSheet.create({
 })
 
 
-function getCardImage(cardType?:string):string{
+function getCardImage(cardType?: string): any {
     switch (cardType) {
         case "Adult Card":
-            return "../assets/images/holo/adult.png"
-            break;
+            return require("../assets/images/holo/adult.png");
         default:
-            return ""
-            break;
+            return require("../assets/images/holo/adult.png");
     }
 }
 
@@ -89,7 +88,7 @@ export function HolocardPreview({cardName, cardType, currentBalance, currentPass
                     <Text style={textStyles.h2}>Balance</Text>
                     <Text className="grow w-full text-center align-middle"
                         style={textStyles.h1}
-                    >${currentBalance/100}</Text>
+                    >${(currentBalance/100).toFixed(2)}</Text>
                     
                 </View>
                 <View style={holocardPreviewStyle.column}>
@@ -105,14 +104,14 @@ export function HolocardPreview({cardName, cardType, currentBalance, currentPass
 export function HolocardInfo({cardName, cardType, physicalCardId}:HolocardInfoProps){
     const asset = Image.resolveAssetSource(require('../assets/images/holo/adult.png'));
     const ratio = asset.width / asset.height;
+    const imageSource = getCardImage(cardType);
     return(
         <View className="self-stretch inline-flex flex-col justify-center items-center gap-2.5">
                 <Text style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(60, 0.6)}]} className="text-center justify-start text-white">{cardName}</Text>
                 <Image 
-                    source={require(getCardImage(cardType))}
+                    source={imageSource}
                     resizeMode="contain"
                     className="grow w-full"
-                    style={{height:scale(163)}}
                     />
                 <Text style={[textStyles.h1, textStyles.bold]} className="text-center justify-start text-white">{physicalCardId}</Text>
         </View>
@@ -146,7 +145,7 @@ export function HolocardBalance({currentBalance, totalSpentMonth, totalSpentToda
                     <Text className="text-white" style={[textStyles.h1]}>Month Pass • {today.toLocaleString('default', { month: 'long' })}</Text>
                     {/**Progress Bar Component*/}
                     <View className="flex">
-                        <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({totalAmount: 80, currentAmount:totalSpentMonth})}}></View>
+                        <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({totalAmount: 8000, currentAmount:totalSpentMonth})}}></View>
                         <View className="bg-white w-full h-2 absolute rounded-full"></View>
                     </View>
                     {/**Cash Progress Component*/}
@@ -160,7 +159,7 @@ export function HolocardBalance({currentBalance, totalSpentMonth, totalSpentToda
                     <Text className="text-white" style={[textStyles.h1]}>Daily Pass • {today.toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric'} )}</Text>
                     {/**Progress Bar Component*/}
                     <View className="flex">
-                        <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({totalAmount: 7.5, currentAmount:totalSpentToday})}}></View>
+                        <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({totalAmount: 750, currentAmount:totalSpentToday})}}></View>
                         <View className="bg-white w-full h-2 absolute rounded-full"></View>
                     </View>
                     {/**Cash Progress Component*/}
@@ -206,30 +205,32 @@ export function HolocardBalance({currentBalance, totalSpentMonth, totalSpentToda
     )
 }
 
-export function CardActivitySection({activityBalance, activityCharge, activityName, activityTimestamp, activityType, activityDescription}:HolocardCardActivityProps){
+export function HolocardCardActivity({ holocardCardActivities }: { holocardCardActivities: HolocardCardActivityProps[] }){
     return(
-        <View className="flex flex-col">
+        <View className="flex flex-col gap-3">
                 <View className="flex-row justify-between">
                     <Text className="text-white" style={[textStyles.h1, textStyles.bold]}>Card Activity</Text>
                     <Pressable>
                         <Text className="text-white" style={[textStyles.h1]}>See All</Text>
                     </Pressable>
                 </View>
-                {/**Card Activity Card Component*/}
-                <View className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
-                    <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
-                    <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-                        <Text style={[textStyles.h1, textStyles.bold]}>{activityName}</Text>
-                        <Text style={[textStyles.h3, textStyles.bold]}>{activityTimestamp}</Text>
+                {/**Card Activity Card Component*/} 
+                {holocardCardActivities.map((holocardCardActivity, index)=> (
+                    <View key={index} className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
+                        <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+                        <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+                            <Text style={[textStyles.h1, textStyles.bold]}>{holocardCardActivity.activityName}</Text>
+                            <Text style={[textStyles.h3, textStyles.bold]}>{holocardCardActivity.activityTimestamp}</Text>
+                        </View>
+                        <View className="flex-1 flex-col justify-center items-start gap-2.5">
+                            <Text style={[textStyles.h3, textStyles.bold,]}>{holocardCardActivity.activityDescription}</Text>
+                        </View>
+                        <View className="flex flex-col justify-start items-end gap-2.5">
+                            {holocardCardActivity.activityCharge<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>}
+                            <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>
+                        </View>
                     </View>
-                    <View className="flex-1 flex-col justify-center items-start gap-2.5">
-                        <Text style={[textStyles.h3, textStyles.bold,]}>{activityDescription}</Text>
-                    </View>
-                    <View className="flex flex-col justify-start items-end gap-2.5">
-                        {activityCharge<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${(activityBalance/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>-${(activityBalance/100).toFixed(2)}</Text>}
-                        <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(activityBalance/100).toFixed(2)}</Text>
-                    </View>
-                </View>
+                ))}
             </View>
     )
 }
