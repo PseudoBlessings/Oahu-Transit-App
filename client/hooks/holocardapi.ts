@@ -198,6 +198,7 @@ export interface GetTransitAccountProductsResponse{
     Messages: string[];
     Success: boolean;
 }
+
 export async function getCards(cookies?: string):Promise<readonly [GetTransitAccountsResponse, GetTransitAccountProductsResponse[]]>{
     try{
         let getTransitAccountsResponse: Response;
@@ -394,3 +395,255 @@ export async function getCards(cookies?: string):Promise<readonly [GetTransitAcc
     //     }
     // }
 }
+
+
+export interface Transaction {
+    AppliedCapping: any | null;
+    DeviceNumber: number;
+    LineName: string;
+    LineNumber: number;
+    NumberOfPersons: number;
+    OperatorId: number;
+    PurseBalance: number;
+    PurseBalancePreTax: number | null;
+    PurseCredit: number;
+    PurseCreditPreTax: number | null;
+    Result: string;
+    ResultId: number;
+    SalesChannelId: number;
+    SalesChannel: string | null;
+    StopName: string;
+    StopNumber: number;
+    TicketExternalNumber: number;
+    TicketName: string;
+    Timestamp: string; // ISO 8601 Date string
+    TransactionId: string;
+    TransactionType: string;
+    TransactionTypeId: number;
+    ValidFrom: string;  // ISO 8601 Date string
+    ValidTo: string;    // ISO 8601 Date string
+    VehicleNumber: number;
+}
+
+export interface GetTransactionHistoryData {
+    Transaction: Transaction;
+    RetailLocation: any | null;
+}
+
+export interface GetTransactionHistoryResponse {
+    Success: boolean;
+    Messages: string[];
+    ErrorsByField: Record<string, string[]>;
+    Data: GetTransactionHistoryData[];
+}
+
+
+export interface CapingPotResult {
+    PotId: number;
+    Name: string;
+    ValidFrom: string; // ISO 8601 Date string
+    ValidTo: string;   // ISO 8601 Date string
+    Amount: number;
+    CurrentValue: number;
+    MissingValue: number;
+    Description: string;
+}
+
+export interface GetCappingPotsByTransitAccountData {
+    Result: CapingPotResult[];
+    TotalCount: number;
+}
+
+export interface GetCappingPotsByTransitAccountResponse {
+    Success: boolean;
+    Messages: string[];
+    ErrorsByField: Record<string, any>;
+    Data: GetCappingPotsByTransitAccountData;
+}
+
+export async function getSpecificCardInfo(transitAccountId: number, cookies?: string):Promise<readonly [GetTransactionHistoryResponse,GetCappingPotsByTransitAccountResponse]>{
+    let getCappingPotsByTransitAccountData:GetCappingPotsByTransitAccountResponse
+    let getTransactionHistoryData:GetTransactionHistoryResponse;
+    try{
+        if(cookies && cookies.trim().length > 0){
+            const getTransactionHistoryResponse = await fetch("https://www.holocard.net/umbraco/Api/CustomerAccountApi/GetTransactionHistory", {
+            "headers": {
+                "accept": "application/json, text/javascript, */*; q=0.01",
+                "accept-language": "en",
+                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "x-requested-with": "XMLHttpRequest",
+                "cookie": cookies,
+                "Referer": "https://www.holocard.net/en/customeraccount/my-cards/"
+            },
+            "body": `TransitAccountId=${transitAccountId}&Take=50`,
+            "method": "POST"
+            });
+            getTransactionHistoryData  = await getTransactionHistoryResponse.json()
+            if(getTransactionHistoryData.Messages[1] = "invalid session"){
+                throw new Error("invalid session");
+            }
+            console.log(getTransactionHistoryData)
+            
+        }else{
+            const getTransactionHistoryResponse = await fetch("https://www.holocard.net/umbraco/Api/CustomerAccountApi/GetTransactionHistory", {
+                    "headers": {
+                        "accept": "application/json, text/javascript, */*; q=0.01",
+                        "accept-language": "en",
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+                        "sec-ch-ua-mobile": "?0",
+                        "sec-ch-ua-platform": "\"Windows\"",
+                        "sec-fetch-dest": "empty",
+                        "sec-fetch-mode": "cors",
+                        "sec-fetch-site": "same-origin",
+                        "x-requested-with": "XMLHttpRequest"
+                    },
+                    "referrer": "https://www.holocard.net/en/customeraccount/my-cards/",
+                    "body": "TransitAccountId=3576078&Take=50",
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "include"
+                    });
+            getTransactionHistoryData  = await getTransactionHistoryResponse.json()
+            if(getTransactionHistoryData.Messages[1] = "invalid session"){
+                throw new Error("invalid session");
+            }
+            console.log(getTransactionHistoryData)
+        }
+    }catch(error){
+        console.error(`Error fetching transaction history of account #${transitAccountId} error:`, error);
+        throw error;
+    }
+
+    try{
+        if(cookies && cookies.trim().length > 0){
+            const getCappingPotsByTransitAccountResponse = await fetch("https://www.holocard.net/umbraco/Api/CustomerAccountApi/GetCappingPotsByTransitAccount", {
+                "headers": {
+                    "accept": "application/json, text/javascript, */*; q=0.01",
+                    "accept-language": "en",
+                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+                    "sec-ch-ua-mobile": "?0",
+                    "sec-ch-ua-platform": "\"Windows\"",
+                    "sec-fetch-dest": "empty",
+                    "sec-fetch-mode": "cors",
+                    "sec-fetch-site": "same-origin",
+                    "x-requested-with": "XMLHttpRequest",
+                    "cookie": "_ga=GA1.1.713995643.1769149985; .AspNetCore.Antiforgery.1PT5AqCGLRE=CfDJ8NfMm-Hhw9JBnr4ewCvVEjK9olUMmgclGhBNqCc3ansRecbdIFREHtOX5akY7fc_12CtuQhzD0vpneF6sDmXh834Wl_X1HKq2qwPvKt7yft_yW1p9dM_hYQg7AFVcuE9DJPmyseeoDxus6CbauFV0mc; BIGipServerprod-www.app~prod-www_pool=861692938.20480.0000; _ga_XHF2XRCXBB=GS2.1.s1773713625$o34$g1$t1773713703$j60$l0$h0; __jwt=eyJhbGciOiJIUzI1NiIsImtpZCI6ImVGYXJlV2ViUG9ydGFsSG9sbyIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiQWRtaW5pc3RyYXRvciIsInVzZXJUeXBlIjoiQ3VzdG9tZXIiLCJuYW1lIjoiWnZpa29tYm9yZXJvIE1hc2lrZSIsImN1c3RvbWVyQWNjb3VudElkIjoiMTIxNDEzNCIsImVtYWlsQWRkcmVzcyI6InptYXNpa2VAZ21haWwuY29tIiwic3RhdGUiOiJBQ1RJVkUiLCJ1c2VybmFtZSI6InptYXNpa2VAZ21haWwuY29tIiwiY2hhbCI6ImZhbHNlIiwicGFzc3dvcmRGb3JjZVVwZGF0ZSI6ImZhbHNlIiwiZGF5c0JlZm9yZUV4cGlyYXRpb24iOiIwIiwicmVxdWVzdFBhc3N3b3JkUmVzZXQiOiJmYWxzZSIsImFjY291bnRWZXJpZmljYXRpb24iOiJmYWxzZSIsInJlcXVlc3RQYXNzd29yZFNldCI6ImZhbHNlIiwidWlkIjoiMTM1YjdlOTEtNjk1ZS00MGE3LTk1ZTgtODJmNDk4ODRjMDg5IiwibmJmIjoxNzczNzE0OTE1LCJleHAiOjE3NzM3MTU4MTUsImlhdCI6MTc3MzcxNDkxNSwiaXNzIjoiaHR0cHM6Ly93d3cuaG9sb2NhcmQubmV0LyIsImF1ZCI6WyJodHRwczovL3d3dy5ob2xvY2FyZC5uZXQvIiwiaHR0cHM6Ly93d3cuaG9sb2NhcmQubmV0LyIsImh0dHBzOi8vd3d3LmhvbG9jYXJkLm5ldC8iLCJodHRwczovL3d3dy5ob2xvY2FyZC5uZXQvIiwiaHR0cHM6Ly93d3cuaG9sb2NhcmQubmV0LyIsImh0dHBzOi8vd3d3LmhvbG9jYXJkLm5ldC8iLCJodHRwczovL3d3dy5ob2xvY2FyZC5uZXQvIiwiaHR0cHM6Ly93d3cuaG9sb2NhcmQubmV0LyJdfQ.RcyDLV9ecmt51s9O__GynaDruOf5sFF3WgW1mYFqWcU",
+                    "Referer": "https://www.holocard.net/en/customeraccount/my-cards/"
+                },
+                "body": `TransitAccountId=${transitAccountId}`,
+                "method": "POST"
+            });
+            getCappingPotsByTransitAccountData = await getCappingPotsByTransitAccountResponse.json()
+            if(getCappingPotsByTransitAccountData.Messages[1] = "invalid session"){
+                throw new Error("invalid session");
+            }
+            console.log(getCappingPotsByTransitAccountData)
+            
+        }else{
+            const getCappingPotsByTransitAccountResponse = await fetch("https://www.holocard.net/umbraco/Api/CustomerAccountApi/GetCappingPotsByTransitAccount", {
+                "headers": {
+                    "accept": "application/json, text/javascript, */*; q=0.01",
+                    "accept-language": "en",
+                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
+                    "sec-ch-ua-mobile": "?0",
+                    "sec-ch-ua-platform": "\"Windows\"",
+                    "sec-fetch-dest": "empty",
+                    "sec-fetch-mode": "cors",
+                    "sec-fetch-site": "same-origin",
+                    "x-requested-with": "XMLHttpRequest"
+                },
+                "referrer": "https://www.holocard.net/en/customeraccount/my-cards/",
+                "body": `TransitAccountId=${transitAccountId}`,
+                "method": "POST",
+                "mode": "cors",
+                "credentials": "include"
+                });
+            getCappingPotsByTransitAccountData = await getCappingPotsByTransitAccountResponse.json()
+            if(getCappingPotsByTransitAccountData.Messages[1] = "invalid session"){
+                throw new Error("invalid session");
+            }
+            console.log(getCappingPotsByTransitAccountData)
+            
+            
+        }
+    }catch(error){
+        console.error(`Error fetching capping pots info of account #${transitAccountId} error:`, error);
+        throw error;
+    }
+    const cardInfo:readonly [GetTransactionHistoryResponse,GetCappingPotsByTransitAccountResponse] = [getTransactionHistoryData,getCappingPotsByTransitAccountData];
+
+    return cardInfo
+}
+
+/**
+ * {
+    * "Success": boolean,
+    * "Messages": any[],
+    * "ErrorsByField": Record<string, any>,
+    * "Data": {
+        * "Result": [
+            * {
+            * "PotId": number,
+            * "Name": string,
+            * "ValidFrom": string,   // ISO 8601 Date
+            * "ValidTo": string,     // ISO 8601 Date
+            * "Amount": number,      // e.g., 8000 (cents/units)
+            * "CurrentValue": number,
+            * "MissingValue": number,
+            * "Description": string
+            * }
+        * ],
+        * "TotalCount": number
+    * }
+ * }
+ * 
+ * 
+ * 
+ * {
+    * "Success": boolean,
+    * "Messages": string[],
+    * "ErrorsByField": Record<string, any>,
+    * "Data": [
+        * {
+            * "Transaction": {
+                * "AppliedCapping": null | any,
+                * "DeviceNumber": number,
+                * "LineName": string,
+                * "LineNumber": number,
+                * "NumberOfPersons": number,
+                * "OperatorId": number,
+                * "PurseBalance": number,
+                * "PurseBalancePreTax": null | number,
+                * "PurseCredit": number,
+                * "PurseCreditPreTax": null | number,
+                * "Result": string,
+                * "ResultId": number,
+                * "SalesChannelId": number,
+                * "SalesChannel": null | string,
+                * "StopName": string,
+                * "StopNumber": number,
+                * "TicketExternalNumber": number,
+                * "TicketName": string,
+                * "Timestamp": string, // ISO 8601 Date
+                * "TransactionId": string,
+                * "TransactionType": string,
+                * "TransactionTypeId": number,
+                * "ValidFrom": string, // ISO 8601 Date
+                * "ValidTo": string,   // ISO 8601 Date
+                * "VehicleNumber": number
+            * },
+            * "RetailLocation": null | any
+        * }
+    * ]
+ * }
+ */
+
