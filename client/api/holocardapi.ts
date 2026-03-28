@@ -129,7 +129,7 @@ interface CurrentCustomerAccountData {
     VanpoolOperatorId: any | null;
 }
 
-export async function getCurrentCustomerAccount(cookies: string) {
+export async function getCurrentCustomerAccount(cookies?: string) {
         return apiRequest<CurrentCustomerAccountData>("api/CustomerAccountApi/GetCurrentCustomerAccount", "GET", cookies)
 }
 
