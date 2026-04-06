@@ -5,13 +5,13 @@ export interface APIResponse<APIResponseDataType>{
     Success: boolean;
 }
 
-async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET"|"POST", cookies?: string, body?:string){
+async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET"|"POST", cookies?: string, body?:string, contentType?:string){
     const hasCookies = cookies && cookies.trim().length > 0;
     let response:Response;
     try{
         response = await fetch(`https://www.holocard.net/umbraco/${endpoint}`, {
             "headers": {
-                ...(body ? {"accept": "application/json, text/javascript, */*; q=0.01"}  : {"accept": "*/*"}),
+                ...(httpMethod === "POST" ? {"accept": "application/json, text/javascript, */*; q=0.01"}  : {"accept": "*/*"}),
                 "accept-language": "en-US,en;q=0.9",
                 "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"Google Chrome\";v=\"145\", \"Chromium\";v=\"145\"",
                 "sec-ch-ua-mobile": "?0",
@@ -20,6 +20,7 @@ async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET
                 "sec-fetch-mode": "cors",
                 "sec-fetch-site": "same-origin",
                 "x-requested-with": "XMLHttpRequest",
+                ...(contentType ? {"content-type": `${contentType}`} : {}),
                 ...(cookies ? { "cookie": cookies } : {}),
                 "Referer": "https://www.holocard.net/en/customeraccount/my-cards/"
             },
@@ -35,8 +36,15 @@ async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET
 
         const data:APIResponse<APIResponseDataType> = await response.json()
 
+        console.log("Success Message for Endpoint (", endpoint, "):", data.Success)
+        console.log("Message for Endpoint (", endpoint, "):", data.Messages)
+
         if (data.Messages[1] === "invalid session"){
             throw new Error("Session/Cookies are invalid, please get new ones");
+        }
+
+        if (!data.Success){
+            throw new Error("Request resulted in a false success")
         }
 
         return data.Data
@@ -130,7 +138,7 @@ interface CurrentCustomerAccountData {
 }
 
 export async function getCurrentCustomerAccount(cookies?: string) {
-        return apiRequest<CurrentCustomerAccountData>("api/CustomerAccountApi/GetCurrentCustomerAccount", "GET", cookies)
+        return apiRequest<CurrentCustomerAccountData>("api/CustomerAccountApi/GetCurrentCustomerAccount", "POST", cookies)
 }
 
 interface GetTransitAccountsResult {
@@ -204,7 +212,7 @@ export interface GetTransitAccountProductsData{
 }
 
 export async function GetTransitAccountProducts(transitAccountId:number, cookies?:string):Promise<GetTransitAccountProductsData>{
-    return apiRequest<GetTransitAccountProductsData>("Api/CustomerAccountApi/GetTransitAccountProducts", "POST", cookies, `TransitAccountId=${transitAccountId}`)
+    return apiRequest<GetTransitAccountProductsData>("Api/CustomerAccountApi/GetTransitAccountProducts", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
 }
 
 
@@ -263,5 +271,5 @@ export interface GetCappingPotsByTransitAccountData {
 }
 
 export async function getCappingPotsbyTransitAccount(transitAccountId:number, cookies?:string):Promise<GetCappingPotsByTransitAccountData>{
-    return apiRequest<GetCappingPotsByTransitAccountData>("Api/CustomerAccountApi/GetCappingPotsByTransitAccount", "POST", cookies, `TransitAccountId=${transitAccountId}`)
+    return apiRequest<GetCappingPotsByTransitAccountData>("Api/CustomerAccountApi/GetCappingPotsByTransitAccount", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
 }
