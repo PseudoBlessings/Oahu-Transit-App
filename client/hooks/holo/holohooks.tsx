@@ -1,4 +1,4 @@
-import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts } from "@/api/holocardapi";
+import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts, CapingPotResult } from "@/api/holocardapi";
 import { HoloAuthContext } from "@/contexts/holoauthcontext";
 import { HoloAccountInfo, HolocardInfo } from "@/types/holo"
 import { useContext, useEffect, useState } from "react";
@@ -61,25 +61,46 @@ export const useFetchCards = () => {
             cardPhyscialID: res.PrintedNumber,
             cardName: res.Description,
             cardType: res.CardTypeName,
-            balance: res.Balance,
-            currentPass: ""
+            balance: res.Balance
             }));
 
             await Promise.all(parsedCards.map(async (card) => {
-            const [productData, cappingData] = await Promise.all([
-                GetTransitAccountProducts(card.cardId, holoAuth.session!),
-                getCappingPotsbyTransitAccount(card.cardId, holoAuth.session!)
-            ]);
+                const cappingPotsByTransitAccountData = await getCappingPotsbyTransitAccount(card.cardId, holoAuth.session!)
+                card.holocardCappingInfo = cappingPotsByTransitAccountData.Result.map((res: CapingPotResult) => ({
+                    Name: res.Name,
+                    ValidFrom: res.ValidFrom,
+                    ValidTo: res.ValidFrom,
+                    Amount: res.Amount,
+                    CurrentValue: res.CurrentValue,
+                    MissingValue: res.MissingValue,
+                    Description: res.Description
+                }))
+            }))
 
-            productData.Purse.forEach((purse) => {
-                card.currentPass = purse.Description;
-            });
+            cards?.forEach((card) => {
+                card.holocardCappingInfo?.sort((a, b) => {
+                    const timestampA:number = Date.parse(a.ValidTo);
+                    const timestampB:number = Date.parse(b.ValidTo);
+                    if(timestampA < timestampB){
+                        return -1;
+                    }
+                    else if(timestampB === timestampA){
+                        return 0;
+                    }
+                    return 1;
+                })
+            })
 
-            cappingData.Result.forEach((cap) => {
-                if (cap.MissingValue === 0) {
-                card.currentPass = cap.Description === "1Mo" ? "Month Pass" : "Day Pass";
+            await Promise.all(parsedCards.map(async (card) => {
+            const CappingPotsByTransitAccountData = await GetTransitAccountProducts(card.cardId, holoAuth.session!)
+            let latestPass:number = 0;
+            card.holocardCappingInfo?.forEach((cappingInfo, index) => {
+                const timestamp:number = Date.parse(cappingInfo.ValidTo) 
+                if(cappingInfo.MissingValue === 0 && timestamp > latestPass){
+                    latestPass = timestamp;
+                    card.currentPass = cappingInfo.Name
                 }
-            });
+            })
             }));
             setCards([...parsedCards]); 
         } catch (error) {

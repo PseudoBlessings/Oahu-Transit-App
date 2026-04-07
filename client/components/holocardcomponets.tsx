@@ -6,6 +6,7 @@ import Foundation from "@expo/vector-icons/Foundation";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { HolocardCappingInfo } from "@/types/holo";
 
 export interface HolocardPreviewProps{
     cardName:string;
@@ -20,10 +21,16 @@ export interface HolocardInfoProps{
     physicalCardId:number|string;
 }
 
+export interface HolocardCappingProps{
+    passName: string; 
+    totalSpent: number; 
+    totalNeeded:number; 
+    ValidTo:string //ISO Format;
+}
+
 export interface HolocardBalanceProps{
     currentBalance: number;
-    totalSpentToday: number;
-    totalSpentMonth: number;
+    currentCaps?: HolocardCappingInfo[]
     autoloadDate?: string;
     autoloadAmount?: number;
 }
@@ -118,7 +125,41 @@ export function HolocardInfo({cardName, cardType, physicalCardId}:HolocardInfoPr
     )
 }
 
-export function HolocardBalance({currentBalance, totalSpentMonth, totalSpentToday, autoloadAmount, autoloadDate}:HolocardBalanceProps){
+function HolocardCapping({passName, totalSpent, totalNeeded, ValidTo}:HolocardCappingProps){
+    const progressCalc = (options: { percentage?: number; currentAmount?: number; totalAmount?: number }):DimensionValue => {
+        const { percentage, currentAmount, totalAmount } = options;
+        if (percentage !== undefined) {
+            if (percentage > 1) {
+                throw new Error("Percentage cannot be higher than 1");
+            }
+            return `${percentage * 100}%`;
+        } else if (currentAmount !== undefined && totalAmount !== undefined) {
+            const progress = currentAmount > totalAmount ? 1 : currentAmount / totalAmount;
+            return `${progress * 100}%`;
+        } else {
+            throw new Error("Either percentage or both currentAmount and totalAmount must be provided");
+        }
+    }
+
+
+    return(
+        <View className="flex-col gap-2">
+            <Text className="text-white" style={[textStyles.h1]}>{passName} Pass • {new Date(ValidTo).toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric'} )}</Text>
+            {/**Progress Bar Component*/}
+            <View className="flex">
+                <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({totalAmount: totalNeeded, currentAmount: totalSpent})}}></View>
+                <View className="bg-white w-full h-2 absolute rounded-full"></View>
+            </View>
+            {/**Cash Progress Component*/}
+            <View className="flex flex-row justify-between">
+                <Text className="text-white" style={[textStyles.h2]}>${(totalSpent/100).toFixed(2)}</Text>
+                <Text className="text-white" style={[textStyles.h2]}>${(totalNeeded/100).toFixed(2)}</Text>
+            </View>
+        </View>
+    )
+}
+
+export function HolocardBalance({currentBalance, currentCaps, autoloadAmount, autoloadDate}:HolocardBalanceProps){
     const today = new Date()
 
     const progressCalc = (options: { percentage?: number; currentAmount?: number; totalAmount?: number }):DimensionValue => {
@@ -140,34 +181,9 @@ export function HolocardBalance({currentBalance, totalSpentMonth, totalSpentToda
             <View className="flex-col px-7 py-5 gap-2.5" style={[cardStyles.card, {backgroundColor:`${Colors.HoloAccentColor}`}]}>
                 <Text className="text-white" style={[textStyles.h1]}>Card Balance</Text>
                 <Text className="text-white" style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(96, 0.65)}]}>${(currentBalance/100).toFixed(2)}</Text>
-                {/**Monthly Pass Progress Component*/}
-                <View className="flex-col gap-2">
-                    <Text className="text-white" style={[textStyles.h1]}>Month Pass • {today.toLocaleString('default', { month: 'long' })}</Text>
-                    {/**Progress Bar Component*/}
-                    <View className="flex">
-                        <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({totalAmount: 8000, currentAmount:totalSpentMonth})}}></View>
-                        <View className="bg-white w-full h-2 absolute rounded-full"></View>
-                    </View>
-                    {/**Cash Progress Component*/}
-                    <View className="flex flex-row justify-between">
-                        <Text className="text-white" style={[textStyles.h2]}>${(totalSpentMonth/100).toFixed(2)}</Text>
-                        <Text className="text-white" style={[textStyles.h2]}>$80.00</Text>
-                    </View>
-                </View>
-                {/**Daily Pass Progress Component*/}
-                <View className="flex-col gap-2">
-                    <Text className="text-white" style={[textStyles.h1]}>Daily Pass • {today.toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric'} )}</Text>
-                    {/**Progress Bar Component*/}
-                    <View className="flex">
-                        <View className="h-2 z-10 absolute rounded-full" style={{backgroundColor:`${Colors.HoloSecondaryColor}`, width:progressCalc({totalAmount: 750, currentAmount:totalSpentToday})}}></View>
-                        <View className="bg-white w-full h-2 absolute rounded-full"></View>
-                    </View>
-                    {/**Cash Progress Component*/}
-                    <View className="flex flex-row justify-between">
-                        <Text className="text-white" style={[textStyles.h2]}>${(totalSpentToday/100).toFixed(2)}</Text>
-                        <Text className="text-white" style={[textStyles.h2]}>$7.50</Text>
-                    </View>
-                </View>
+                {currentCaps?.map((currentCap, index)=>(
+                    <HolocardCapping key={index} passName={currentCap.Name} totalNeeded={currentCap.Amount} totalSpent={currentCap.CurrentValue} ValidTo={currentCap.ValidTo}/>
+                ))}
                 { autoloadAmount&&autoloadDate ? (
                     <Text className="text-white opacity-50" style={[textStyles.h1]}>Next Autoload {autoloadDate} ${(autoloadAmount/100).toFixed(2)}</Text>
                 ) : null}

@@ -45,7 +45,7 @@ const holocard = holoContext?.holocards?.find((card) => {
     return(
         <ScrollView contentContainerStyle={{paddingHorizontal:5, paddingTop:10, paddingBottom:60, gap:15}} style={{backgroundColor:`${Colors.HoloSecondaryColor}`}}>
             <HolocardInfo cardName={holocard?.cardName ?? "Holocard"} cardType={holocard?.cardType ?? ""} physicalCardId={holocard?.cardPhyscialID ?? ""}/>
-            <HolocardBalance currentBalance={holocard?.balance ?? 0} totalSpentMonth={5500} totalSpentToday={400}/>
+            <HolocardBalance currentBalance={holocard?.balance ?? 0} currentCaps={holocard?.holocardCappingInfo}/>
             <HolocardCardActivity holocardCardActivities={sampleActivities}/>
         </ScrollView>
     )
