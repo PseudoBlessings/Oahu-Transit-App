@@ -5,7 +5,7 @@ const { width } = Dimensions.get('window');
 const guidelineBaseWidth = 1080;
 
 export const scale = (size:number) => (width / guidelineBaseWidth) * size;
-
+export const moderateScale = (size: number, factor = 0.5) => size + (scale(size) - size) * factor;
 
 export const Colors = {
     HoloPrimaryColor: '#1C4D63',
@@ -22,17 +22,17 @@ export const textStyles = StyleSheet.create(
     },
     h1:{
         fontFamily: "Nimbus Sans L",
-        fontSize:scale(40)
+        fontSize:moderateScale(40, 0.70)
 
     },
     h2:{
         fontFamily: "Nimbus Sans L",
-        fontSize:scale(32)
+        fontSize:moderateScale(32, 0.70)
 
     },
     h3:{
         fontFamily: "Nimbus Sans L",
-        fontSize:scale(20)
+        fontSize:moderateScale(20, 0.70)
 
     },
     p:{
@@ -43,17 +43,14 @@ export const textStyles = StyleSheet.create(
     }
 })
 
-// style={{width: '100%', height: '100%', padding: 10, background: 'white', boxShadow: '0px 4px 75px 3px rgba(0, 0, 0, 0.25)', overflow: 'hidden', borderRadius: 25, justifyContent: 'flex-start', alignItems: 'center', gap: 30, display: 'inline-flex'}}
-
 export const cardStyles = StyleSheet.create(
     {
         card:{
             padding:scale(10),
-            flex: 1,
             borderRadius: scale(25),
             boxShadow: '0px 4px 75px 3px rgba(0, 0, 0, 0.25)',
-            width:'100%',
-            height:'100%',
+            width: '100%', 
+            alignSelf: 'flex-start',
             overflow:"hidden",
             
         }

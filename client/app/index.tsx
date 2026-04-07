@@ -1,19 +1,18 @@
 import { useContext } from "react";
 import { Text, View } from "react-native";
-import { HoloContext } from "@/contexts/holoauthcontext";
-import HoloPocket, {HoloPocketProps} from "./holopocket";
-import type {HolocardPreviewInterface} from "@/components/holocardcomponets"
+import type {HolocardPreviewProps} from "@/components/holocardcomponets"
+import Holocard from "./holocard";
+import HoloPocket from "./holopocket";
 
-const DummyHoloCardPreview:HolocardPreviewInterface[] = [{cardName: "Z's Card", cardType: "Adult", currentBalance: 1000, currentPass:""}, {cardName: "WEwooo Card", cardType: "Adult", currentBalance: 1050, currentPass:""}]
+const DummyHoloCardPreview:HolocardPreviewProps[] = [{cardName: "Z's Card", cardType: "Adult", currentBalance: 1000, currentPass:""}, {cardName: "WEwooo Card", cardType: "Adult", currentBalance: 1050, currentPass:""}]
 
 
 export default function Index() {
-  const { session, setSession, holoAccessGranted } = useContext(HoloContext)
   return (
     <View
       className="flex-1"
     >
-      <HoloPocket holocardsPreviews={DummyHoloCardPreview}/>
+      <HoloPocket/>
     </View>
   );
 }
