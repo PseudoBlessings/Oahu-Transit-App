@@ -14,8 +14,8 @@ export interface HolocardInfo{
     cardType: string
     cardName: string
     balance: number
-    holocardCappingInfo: HolocardCappingInfo[] | undefined
-    currentPass:string
+    holocardCappingInfo?: HolocardCappingInfo[]
+    currentPass?:string
 }
 
 export interface HoloAccountInfo{

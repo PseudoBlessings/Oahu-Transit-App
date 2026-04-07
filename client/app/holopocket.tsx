@@ -27,7 +27,7 @@ export default function HoloPocket(){
             {holoContext?.holocards?.map((holocardInfo, index) => (
                 <Pressable key={holocardInfo.cardId} onPress={() => handleCardPress(holocardInfo.cardId)} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}>
                     <View key={index} className="mb-5">
-                        <HolocardPreview cardName={holocardInfo.cardName} cardType={holocardInfo.cardType} currentBalance={holocardInfo.balance} currentPass={holocardInfo.currentPass}/>
+                        <HolocardPreview cardName={holocardInfo.cardName} cardType={holocardInfo.cardType} currentBalance={holocardInfo.balance} currentPass={holocardInfo.currentPass ?? ""}/>
                     </View>
                 </Pressable>
             ))}
