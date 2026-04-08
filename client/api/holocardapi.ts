@@ -273,3 +273,27 @@ export interface GetCappingPotsByTransitAccountData {
 export async function getCappingPotsbyTransitAccount(transitAccountId:number, cookies?:string):Promise<GetCappingPotsByTransitAccountData>{
     return apiRequest<GetCappingPotsByTransitAccountData>("Api/CustomerAccountApi/GetCappingPotsByTransitAccount", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
 }
+
+export interface GetAutoloadsByTransitAccountIdData{
+    AutoloadLimit: null;
+    AutoloadResetPeriod: null;
+    AutoloadThresholdValue: number;
+    AutoloadType: number;
+    AutoloadValue: number;
+    BackupFundingSourceId: number;
+    CustomerAccountId: number;
+    FundingSourceId: number;
+    Id: number;
+    InstitutionAccountID: null;
+    MultipleFundingSorces: [];
+    PartialAutoloadValue: number;
+    PeroidDayofMonth: number;
+    periodRunDate: string; //ISO 8601 Date String
+    ProductId: number;
+    SuspendFrom: null;
+    SuspendTo: null;
+}
+
+export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
+    return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
+}
