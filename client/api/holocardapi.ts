@@ -217,31 +217,31 @@ export async function GetTransitAccountProducts(transitAccountId:number, cookies
 
 
 export interface Transaction {
-    AppliedCapping: any | null;
-    DeviceNumber: number;
-    LineName: string;
-    LineNumber: number;
-    NumberOfPersons: number;
+    AppliedCapping: string | null;
+    DeviceNumber: number | null;
+    LineName: string | null;
+    LineNumber: number | null;
+    NumberOfPersons: number | null;
     OperatorId: number;
-    PurseBalance: number;
+    PurseBalance: number | null;
     PurseBalancePreTax: number | null;
-    PurseCredit: number;
+    PurseCredit: number | null;
     PurseCreditPreTax: number | null;
-    Result: string;
-    ResultId: number;
-    SalesChannelId: number;
+    Result: "Ok" | "ErrorInsufficientCredit" | "ErrorController" | "ErrorCiAlreadyDenied" | string;
+    ResultId: number | null;
+    SalesChannelId: number | null;
     SalesChannel: string | null;
-    StopName: string;
-    StopNumber: number;
+    StopName: string | null;
+    StopNumber: number | null;
     TicketExternalNumber: number;
     TicketName: string;
     Timestamp: string; // ISO 8601 Date string
-    TransactionId: string;
-    TransactionType: string;
+    TransactionId: string; // UUID
+    TransactionType: "Boarding" | "Charge" | "Transfer" | "Use" | "83" | "FareMediaSale" | "Load" | string ;
     TransactionTypeId: number;
-    ValidFrom: string;  // ISO 8601 Date string
-    ValidTo: string;    // ISO 8601 Date string
-    VehicleNumber: number;
+    ValidFrom: string | null;  // ISO 8601 Date string
+    ValidTo: string | null;    // ISO 8601 Date string
+    VehicleNumber: number | null;
 }
 
 export interface GetTransactionHistoryData {
@@ -249,8 +249,8 @@ export interface GetTransactionHistoryData {
     RetailLocation: any | null;
 }
 
-export async function getTransitHistory(transitAccountId:number, take:number = 50, cookies?:string):Promise<GetTransactionHistoryData>{
-    return apiRequest<GetTransactionHistoryData>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, `TransitAccountId=${transitAccountId}&Take=${take}`);
+export async function getTransitHistory(transitAccountId:number, take:number = 50, cookies?:string):Promise<GetTransactionHistoryData[]>{
+    return apiRequest<GetTransactionHistoryData[]>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, `TransitAccountId=${transitAccountId}&Take=${take}`);
 }
 
 
@@ -294,6 +294,6 @@ export interface GetAutoloadsByTransitAccountIdData{
     AutoloadResetPeriod: number | null;
 }
 
-export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
+export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string):Promise<GetAutoloadsByTransitAccountIdData[]>{
     return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
 }
