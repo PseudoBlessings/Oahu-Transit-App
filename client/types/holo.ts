@@ -26,8 +26,8 @@ export interface HoloAccountInfo{
 }
 
 export interface HolocardAutoloadInfo{
-    cardID:string;
-    autoloadID:string;
+    cardId:number;
+    autoloadId:number;
     autoloadType: "Monthly" | "Threshold";
     autoloadThresholdAmount?: number;
     autoloadDate?: string; //ISO 8601 Date string

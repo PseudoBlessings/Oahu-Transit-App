@@ -1,6 +1,6 @@
-import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts, CapingPotResult } from "@/api/holocardapi";
+import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts, CapingPotResult, getAutoloadsByTransitAccountId } from "@/api/holocardapi";
 import { HoloAuthContext } from "@/contexts/holoauthcontext";
-import { HoloAccountInfo, HolocardInfo } from "@/types/holo"
+import { HoloAccountInfo, HolocardAutoloadInfo, HolocardInfo } from "@/types/holo"
 import { useContext, useEffect, useState } from "react";
 
 export const useFetchAccount = () => {
@@ -116,3 +116,51 @@ export const useFetchCards = () => {
 
     return { cards, loading, error };
 };
+
+export const useFetchAutoloads = (transitAccountId:number) => {
+    const [autoloadsInfo, setAutoloadsInfo] = useState<HolocardAutoloadInfo[] | undefined>(undefined);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const holoAuth = useContext(HoloAuthContext); 
+
+    useEffect(() => {
+        const getAutoloadsInfo = async () => {
+            if (!holoAuth?.session || !holoAuth.holoAccessGranted) {
+            setLoading(false);
+            return;
+        }
+
+        try{
+            const autoloadsInfo = await getAutoloadsByTransitAccountId(transitAccountId, holoAuth.session!)
+            // Implement a conditional for the autoload type of monthly and threshold
+            
+            const parsedAutoloadsInfo:HolocardAutoloadInfo[] = autoloadsInfo.map((autoloadInfo) => {
+                if(autoloadInfo.periodRunDate){
+                    return{
+                        cardId: transitAccountId,
+                        autoloadId: autoloadInfo.Id,
+                        autoloadType: "Monthly",
+                        autoloadDate: autoloadInfo.periodRunDate,
+                        autoloadAmount: autoloadInfo.AutoloadValue
+                    }
+                }else{
+                    return{
+                        cardId: transitAccountId,
+                        autoloadId: autoloadInfo.Id,
+                        autoloadType: "Threshold",
+                        autoloadThreshold: autoloadInfo.AutoloadThresholdValue,
+                        autoloadAmount: autoloadInfo.AutoloadValue
+                    }
+                }
+            })
+        }catch(error){
+            console.error("Failed to fetch schedule autoloads: ", error)
+            setError(true)
+        }finally{
+            setLoading(false)
+        }
+        }
+    })
+    return {autoloadsInfo, loading, error}
+}
