@@ -24,3 +24,13 @@ export interface HoloAccountInfo{
     PhoneNumber: string;
     Email: string;
 }
+
+export interface HolocardAutoloadInfo{
+    cardId:number;
+    autoloadId:number;
+    autoloadType: "Monthly" | "Threshold";
+    autoloadThresholdAmount?: number;
+    autoloadDate?: string; //ISO 8601 Date string
+    autoloadAmount: number;
+    //autoloadPaymentSource?: []; // Will finish once the payment system is implemented.
+}
