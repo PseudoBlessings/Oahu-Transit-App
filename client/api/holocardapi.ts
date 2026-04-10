@@ -275,23 +275,23 @@ export async function getCappingPotsbyTransitAccount(transitAccountId:number, co
 }
 
 export interface GetAutoloadsByTransitAccountIdData{
-    AutoloadLimit: null;
-    AutoloadResetPeriod: null;
-    AutoloadThresholdValue: number;
-    AutoloadType: number;
-    AutoloadValue: number;
-    BackupFundingSourceId: number;
-    CustomerAccountId: number;
-    FundingSourceId: number;
     Id: number;
-    InstitutionAccountID: null;
-    MultipleFundingSorces: [];
-    PartialAutoloadValue: number;
-    PeroidDayofMonth: number;
-    periodRunDate: string; //ISO 8601 Date String
     ProductId: number;
-    SuspendFrom: null;
-    SuspendTo: null;
+    AutoloadType: number;
+    CustomerAccountId: number;
+    InstitutionAccountId: number | null;
+    FundingSourceId: number;
+    BackupFundingSourceId: number | null;
+    AutoloadThresholdValue: number;
+    AutoloadValue: number;
+    SuspendedFrom: string | null;
+    SuspendedTo: string | null;
+    PartialAutoLoadValue: number;
+    MultipleFundingSources: any[];
+    PeriodDayOfMonth: number;
+    PeriodRunDate: string | null;  // ISO 8601 Date String
+    AutoloadLimit: number | null;
+    AutoloadResetPeriod: number | null;
 }
 
 export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){

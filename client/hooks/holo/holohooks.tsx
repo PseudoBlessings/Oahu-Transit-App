@@ -124,7 +124,7 @@ export const useFetchAutoloads = (transitAccountId:number) => {
 
     const holoAuth = useContext(HoloAuthContext); 
 
-    useEffect(() => {
+    const getAutoloads = useEffect(() => {
         const getAutoloadsInfo = async () => {
             if (!holoAuth?.session || !holoAuth.holoAccessGranted) {
             setLoading(false);
@@ -133,15 +133,14 @@ export const useFetchAutoloads = (transitAccountId:number) => {
 
         try{
             const autoloadsInfo = await getAutoloadsByTransitAccountId(transitAccountId, holoAuth.session!)
-            // Implement a conditional for the autoload type of monthly and threshold
-            
+
             const parsedAutoloadsInfo:HolocardAutoloadInfo[] = autoloadsInfo.map((autoloadInfo) => {
-                if(autoloadInfo.periodRunDate){
+                if(autoloadInfo.PeriodRunDate){
                     return{
                         cardId: transitAccountId,
                         autoloadId: autoloadInfo.Id,
                         autoloadType: "Monthly",
-                        autoloadDate: autoloadInfo.periodRunDate,
+                        autoloadDate: autoloadInfo.PeriodRunDate,
                         autoloadAmount: autoloadInfo.AutoloadValue
                     }
                 }else{
@@ -149,11 +148,12 @@ export const useFetchAutoloads = (transitAccountId:number) => {
                         cardId: transitAccountId,
                         autoloadId: autoloadInfo.Id,
                         autoloadType: "Threshold",
-                        autoloadThreshold: autoloadInfo.AutoloadThresholdValue,
+                        autoloadThresholdAmount: autoloadInfo.AutoloadThresholdValue,
                         autoloadAmount: autoloadInfo.AutoloadValue
                     }
                 }
             })
+            setAutoloadsInfo(...[parsedAutoloadsInfo])
         }catch(error){
             console.error("Failed to fetch schedule autoloads: ", error)
             setError(true)
@@ -161,6 +161,7 @@ export const useFetchAutoloads = (transitAccountId:number) => {
             setLoading(false)
         }
         }
-    })
+    getAutoloadsInfo();
+    },[transitAccountId, holoAuth])
     return {autoloadsInfo, loading, error}
 }

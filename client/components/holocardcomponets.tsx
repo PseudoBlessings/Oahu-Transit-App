@@ -6,7 +6,7 @@ import Foundation from "@expo/vector-icons/Foundation";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { HolocardCappingInfo } from "@/types/holo";
+import { HolocardAutoloadInfo, HolocardCappingInfo } from "@/types/holo";
 
 export interface HolocardPreviewProps{
     cardName:string;
@@ -30,9 +30,8 @@ export interface HolocardCappingProps{
 
 export interface HolocardBalanceProps{
     currentBalance: number;
-    currentCaps?: HolocardCappingInfo[]
-    autoloadDate?: string;
-    autoloadAmount?: number;
+    currentCaps?: HolocardCappingInfo[];
+    autoloadsInfo?: HolocardAutoloadInfo[];
 }
 
 export interface HolocardCardActivityProps{
@@ -159,7 +158,7 @@ function HolocardCapping({passName, totalSpent, totalNeeded, ValidTo}:HolocardCa
     )
 }
 
-export function HolocardBalance({currentBalance, currentCaps, autoloadAmount, autoloadDate}:HolocardBalanceProps){
+export function HolocardBalance({currentBalance, currentCaps, autoloadsInfo}:HolocardBalanceProps){
     const today = new Date()
 
     const progressCalc = (options: { percentage?: number; currentAmount?: number; totalAmount?: number }):DimensionValue => {
@@ -184,9 +183,16 @@ export function HolocardBalance({currentBalance, currentCaps, autoloadAmount, au
                 {currentCaps?.map((currentCap, index)=>(
                     <HolocardCapping key={index} passName={currentCap.Name} totalNeeded={currentCap.Amount} totalSpent={currentCap.CurrentValue} ValidTo={currentCap.ValidTo}/>
                 ))}
-                { autoloadAmount&&autoloadDate ? (
-                    <Text className="text-white opacity-50" style={[textStyles.h1]}>Next Autoload {autoloadDate} ${(autoloadAmount/100).toFixed(2)}</Text>
-                ) : null}
+                
+                {
+                    autoloadsInfo?.map((autoloadInfo, index) => {
+                        if(autoloadInfo.autoloadType === "Monthly"){
+                            return <Text key={index} className="text-white opacity-50" style={[textStyles.h1]}> {autoloadInfo.autoloadType} Autoload: {new Date(autoloadInfo.autoloadDate ?? "").toLocaleString('default', { day: '2-digit', month: 'long'} )} ${(autoloadInfo.autoloadAmount/100).toFixed(2)}</Text>
+                        }else{
+                            return <Text key={index} className="text-white opacity-50" style={[textStyles.h1]}> {autoloadInfo.autoloadType} Autoload: Loads ${(autoloadInfo.autoloadAmount/100).toFixed(2)} when below ${((autoloadInfo.autoloadThresholdAmount ?? 0)/100).toFixed(2)} </Text>
+                        }
+                    })
+                }
                 {/**Balance Actions Componenet*/}
                 <View className="flex flex-row self-stretch justify-around items-center overflow-hidden">
                     {/**Autoload Action Componenet*/}
