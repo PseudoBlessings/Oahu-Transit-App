@@ -82,3 +82,13 @@ export interface FareMediaTransaction extends BaseHolocardTransaction{
 export interface EightyThreeTransaction extends BaseTravelTransaction{
     transactionType: "83";
 }
+
+export type Transaction = 
+    | BoardingTransaction 
+    | TransferTransaction 
+    | LoadTransaction
+    | ChargeTransaction
+    | UseTransaction
+    | FareMediaTransaction
+    | EightyThreeTransaction
+    | any
