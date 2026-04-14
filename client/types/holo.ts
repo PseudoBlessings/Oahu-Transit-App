@@ -48,6 +48,8 @@ export interface BaseTravelTransaction extends BaseHolocardTransaction{
     stopName: string;
     vehicleNumber: number;
     lineName: string;
+    validFrom: string | null; // ISO 8601 String
+    validTo: string | null; // ISO 8601 String
 }
 export interface BoardingTransaction extends BaseTravelTransaction{
     transactionType: "Boarding";

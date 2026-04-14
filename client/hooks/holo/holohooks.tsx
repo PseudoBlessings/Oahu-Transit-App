@@ -165,3 +165,19 @@ export const useFetchAutoloads = (transitAccountId:number) => {
     },[transitAccountId, holoAuth])
     return {autoloadsInfo, loading, error}
 }
+
+export const useFetchCardHistory = (transitAccountId:number, take?:number) => {
+
+    const [cardHistory, setcardHistory] = useState< /** Add all the different Transaction Types */ | undefined>(undefined);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const holoAuth = useContext(HoloAuthContext);
+
+    try{
+        const getCardHistory = useEffect(()=>{
+
+        })
+        getCardHistory();
+    }catch(error){}finally{}
+}
