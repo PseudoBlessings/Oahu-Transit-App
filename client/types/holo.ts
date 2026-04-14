@@ -34,3 +34,49 @@ export interface HolocardAutoloadInfo{
     autoloadAmount: number;
     //autoloadPaymentSource?: []; // Will finish once the payment system is implemented.
 }
+
+export interface BaseHolocardTransaction{
+    cardId:number;
+    transactionId:string;
+    timestamp:string;
+    result:"Ok" | "ErrorInsufficientCredit" | "ErrorController" | string;
+    trasactionName:string;
+}
+
+
+export interface BaseTravelTransaction extends BaseHolocardTransaction{
+    stopName: string;
+    vehicleNumber: number;
+    lineName: string;
+}
+export interface BoardingTransaction extends BaseTravelTransaction{
+    transactionType: "Boarding";
+    balance: number;
+    credit: number;
+}
+
+export interface TransferTransaction extends BaseTravelTransaction{
+    transactionType: "Transfer";
+}
+
+export interface ChargeTransaction extends BaseHolocardTransaction{
+    transactionType: "Charge";
+    balance: number;
+    credit: number;
+}
+
+export interface LoadTransaction extends BaseHolocardTransaction{
+    transactionType: "Load";
+}
+
+export interface UseTransaction extends BaseTravelTransaction{
+    transactionType: "Use";
+}
+
+export interface FareMediaTransaction extends BaseHolocardTransaction{
+    transactionType:"FareMediaSale";
+}
+
+export interface EightyThreeTransaction extends BaseTravelTransaction{
+    transactionType: "83";
+}
