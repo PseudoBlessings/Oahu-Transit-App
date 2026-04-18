@@ -6,7 +6,9 @@ import Foundation from "@expo/vector-icons/Foundation";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { HolocardAutoloadInfo, HolocardCappingInfo } from "@/types/holo";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import { HolocardAutoloadInfo, HolocardCappingInfo, Transaction } from "@/types/holo";
 
 export interface HolocardPreviewProps{
     cardName:string;
@@ -35,13 +37,14 @@ export interface HolocardBalanceProps{
 }
 
 export interface HolocardCardActivityProps{
-    activityType: string;
-    activityID:string;
-    activityName: string;
-    activityTimestamp: string;
-    activityDescription?:string;
-    activityCharge: number;
-    activityBalance: number;
+    holocardCardActivities?:Transaction[]
+}
+
+export interface HolocardCardActivityTransactionProps{
+    holocardActivityTransaction:Transaction
+}
+export interface HolocardCardActivityMainInfoProps{
+    holocardActivityTransaction:Transaction
 }
 
 const holocardPreviewStyle = StyleSheet.create({
@@ -227,7 +230,7 @@ export function HolocardBalance({currentBalance, currentCaps, autoloadsInfo}:Hol
     )
 }
 
-export function HolocardCardActivity({ holocardCardActivities }: { holocardCardActivities: HolocardCardActivityProps[] }){
+export function HolocardCardActivity({ holocardCardActivities }: HolocardCardActivityProps){
     return(
         <View className="flex flex-col gap-3">
                 <View className="flex-row justify-between">
@@ -237,22 +240,114 @@ export function HolocardCardActivity({ holocardCardActivities }: { holocardCardA
                     </Pressable>
                 </View>
                 {/**Card Activity Card Component*/} 
-                {holocardCardActivities.map((holocardCardActivity, index)=> (
+                {holocardCardActivities?.map((holocardCardActivity, index)=> {
+                    const credit = "credit" in holocardCardActivity ? holocardCardActivity.credit : 0;
+                    const balance = "balance" in holocardCardActivity ? holocardCardActivity.balance : 0;
+                    return(
                     <View key={index} className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
-                        <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+                        <HolocardCardActivityIcon holocardActivityTransaction={holocardCardActivity}/>
                         <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-                            <Text style={[textStyles.h1, textStyles.bold]}>{holocardCardActivity.activityName}</Text>
-                            <Text style={[textStyles.h3, textStyles.bold]}>{holocardCardActivity.activityTimestamp}</Text>
+                            <HolocardCardActivityMainInfo holocardActivityTransaction={holocardCardActivity}/>
                         </View>
-                        <View className="flex-1 flex-col justify-center items-start gap-2.5">
-                            <Text style={[textStyles.h3, textStyles.bold,]}>{holocardCardActivity.activityDescription}</Text>
+                        <View className="flex-1 flex-col justify-center items-start gap-0.5">
+                            <HolocardCardActivityDescription holocardActivityTransaction={holocardCardActivity}/>
                         </View>
                         <View className="flex flex-col justify-start items-end gap-2.5">
-                            {holocardCardActivity.activityCharge<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>}
-                            <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>
+                            {credit<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${((credit*-1)/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(credit/100).toFixed(2)}</Text>}
+                            <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(balance/100).toFixed(2)}</Text>
                         </View>
                     </View>
-                ))}
+                    )
+                })}
             </View>
     )
+}
+
+function HolocardCardActivityIcon({holocardActivityTransaction}:HolocardCardActivityMainInfoProps){
+    switch(holocardActivityTransaction.transactionType){
+        case "Boarding":
+            return <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+        case "Transfer":
+            return <MaterialCommunityIcons name="bus-multiple" size={24} color="black" />
+        case "Load":
+            return <Fontisto name="bus-ticket" size={50} color="black" />
+        case "Charge":
+            return <MaterialCommunityIcons name="cash-plus" size={50} color="black" />
+        case "Use":
+            return <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+        case "FareMediaSale":
+            return <MaterialIcons name="add-card" size={50} color="black" />
+        case "83":
+    }
+}
+
+function HolocardCardActivityMainInfo({holocardActivityTransaction}:HolocardCardActivityMainInfoProps){
+    
+    let BaseRender = ({transactionTitle}:{transactionTitle: string;}) => (<>
+        <Text style={[textStyles.h1, textStyles.bold]}>{transactionTitle}</Text>
+        <Text style={[textStyles.h3, textStyles.bold]}>{new Date(holocardActivityTransaction.timestamp).toLocaleString('default', {dateStyle:"short", timeStyle:"medium"})}</Text>
+    </>)
+
+    switch(holocardActivityTransaction.transactionType){
+        case "Boarding":
+            return(
+                <BaseRender transactionTitle={holocardActivityTransaction.transactionType}/>
+            )
+        case "Transfer":
+            return(
+                <BaseRender transactionTitle={holocardActivityTransaction.transactionType}/>
+            )
+        case "Load":
+            return(
+                <BaseRender transactionTitle="Added Pass"/>
+            )
+        case "Charge":
+            return(
+                <BaseRender transactionTitle="Reload"/>
+            )
+        case "Use":
+            return(
+                <BaseRender transactionTitle="Used Pass"/>
+            )
+        case "FareMediaSale":
+            return(
+                <BaseRender transactionTitle="Purchased Card"/>
+            )
+        case "83":
+            return
+    }
+}
+
+function HolocardCardActivityDescription({holocardActivityTransaction}:HolocardCardActivityTransactionProps){
+
+    const BaseRender = ({transactionDescription}:{transactionDescription:string;}) =>(
+        <Text numberOfLines={3} ellipsizeMode="tail" style={[textStyles.h3, textStyles.bold]}>
+                {transactionDescription}
+        </Text>
+    )
+
+    switch(holocardActivityTransaction.transactionType){
+        case "Boarding":
+            return(<BaseRender transactionDescription={`${holocardActivityTransaction.lineName} 
+Stop: ${holocardActivityTransaction.stopName}`}/>)
+        case "Transfer":
+            return(<BaseRender transactionDescription={`${holocardActivityTransaction.lineName} 
+Stop: ${holocardActivityTransaction.stopName}`}/>)
+        case "Load":
+            return(<BaseRender transactionDescription={`Loaded: ${holocardActivityTransaction.trasactionName} 
+Valid to: ${new Date(holocardActivityTransaction.validTo ?? "").toLocaleString('default', {dateStyle:'short', timeStyle:'long'})}`}/>)
+        case "Charge":
+            return
+        case "Use":
+            return(<BaseRender transactionDescription={`Used the ${holocardActivityTransaction.trasactionName} Pass 
+${holocardActivityTransaction.lineName} 
+Stop: ${holocardActivityTransaction.stopName} 
+Valid to: ${new Date(holocardActivityTransaction.validTo ?? "").toLocaleString('default', {dateStyle:'short', timeStyle:'long'})}`}/>)
+        case "FareMediaSale":
+            return(
+                <BaseRender transactionDescription={`Bought ${holocardActivityTransaction.trasactionName}`}/>
+            )
+        case "83":
+            return
+    }
 }

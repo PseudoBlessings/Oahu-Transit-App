@@ -250,7 +250,7 @@ export interface GetTransactionHistoryData {
 }
 
 export async function getTransitHistory(transitAccountId:number, take:number = 50, cookies?:string):Promise<GetTransactionHistoryData[]>{
-    return apiRequest<GetTransactionHistoryData[]>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, `TransitAccountId=${transitAccountId}&Take=${take}`);
+    return apiRequest<GetTransactionHistoryData[]>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, `TransitAccountId=${transitAccountId}&Take=${take}`, "application/x-www-form-urlencoded; charset=UTF-8");
 }
 
 

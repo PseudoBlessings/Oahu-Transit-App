@@ -69,6 +69,8 @@ export interface ChargeTransaction extends BaseHolocardTransaction{
 
 export interface LoadTransaction extends BaseHolocardTransaction{
     transactionType: "Load";
+    validFrom: string | null; // ISO 8601 String
+    validTo: string | null; // ISO 8601 String
 }
 
 export interface UseTransaction extends BaseTravelTransaction{
