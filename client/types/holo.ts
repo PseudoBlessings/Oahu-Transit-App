@@ -91,4 +91,3 @@ export type Transaction =
     | UseTransaction
     | FareMediaTransaction
     | EightyThreeTransaction
-    | any
