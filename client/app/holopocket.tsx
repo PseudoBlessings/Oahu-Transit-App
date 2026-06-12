@@ -18,7 +18,8 @@ export default function HoloPocket(){
         });
     };
 
-    return(<View className="flex-1 relative pt-2">
+    return(
+    <View className="flex-1 relative pt-2">
         <View className="left-0 top-0 absolute w-full h-1/3 -z-1 rounded-b-2xl" style={{backgroundColor: Colors.HoloSecondaryColor}}/>
         <ScrollView className="flex-1 px-5">
             <View className="w-full mb-2">

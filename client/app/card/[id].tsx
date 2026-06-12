@@ -1,11 +1,11 @@
 import { View, Text, Image, DimensionValue, Pressable, Button, ScrollView } from "react-native";
 import { useContext, useEffect } from 'react'
-import { Colors} from "@/components/style";
-import { HolocardBalance, HolocardInfo, HolocardCardActivity, HolocardCardActivityProps } from "@/components/holocardcomponets";
+import { HolocardBalance, HolocardInfo, HolocardActivityPreviewsSection } from "@/components/holocardcomponets";
 import { useLocalSearchParams } from 'expo-router';
 import {HoloContext} from '@/contexts/holocontext'
 import { useFetchAutoloads, useFetchCardHistory } from "@/hooks/holo/holohooks";
 import { HolocardAutoloadInfo } from "@/types/holo";
+import { Colors } from "@/components/style";
 
 
 
@@ -29,7 +29,7 @@ const holocard = holoContext?.holocards?.find((card) => {
         <ScrollView contentContainerStyle={{paddingHorizontal:5, paddingTop:10, paddingBottom:60, gap:15}} style={{backgroundColor:`${Colors.HoloSecondaryColor}`}}>
             <HolocardInfo cardName={holocard?.cardName ?? "Holocard"} cardType={holocard?.cardType ?? ""} physicalCardId={holocard?.cardPhyscialID ?? ""}/>
             <HolocardBalance currentBalance={holocard?.balance ?? 0} currentCaps={holocard?.holocardCappingInfo} autoloadsInfo={autoloadsInfo}/>
-            <HolocardCardActivity holocardCardActivities={cardHistory?.slice(0, 3)}/>
+            <HolocardActivityPreviewsSection holocardActivities={cardHistory?.slice(0, 3)}/>
         </ScrollView>
     )
 } 

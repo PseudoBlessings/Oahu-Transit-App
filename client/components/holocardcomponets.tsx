@@ -35,9 +35,12 @@ export interface HolocardBalanceProps{
     currentCaps?: HolocardCappingInfo[];
     autoloadsInfo?: HolocardAutoloadInfo[];
 }
+export interface HolocardActivities{
+    holocardActivities?:Transaction[]
+}
 
-export interface HolocardCardActivityProps{
-    holocardCardActivities?:Transaction[]
+export interface HolocardActivity{
+    holocardActivity?:Transaction
 }
 
 export interface HolocardCardActivityTransactionProps{
@@ -230,7 +233,7 @@ export function HolocardBalance({currentBalance, currentCaps, autoloadsInfo}:Hol
     )
 }
 
-export function HolocardCardActivity({ holocardCardActivities }: HolocardCardActivityProps){
+export function HolocardActivityPreviewsSection({ holocardActivities }: HolocardActivities){
     return(
         <View className="flex flex-col gap-3">
                 <View className="flex-row justify-between">
@@ -239,28 +242,44 @@ export function HolocardCardActivity({ holocardCardActivities }: HolocardCardAct
                         <Text className="text-white" style={[textStyles.h1]}>See All</Text>
                     </Pressable>
                 </View>
-                {/**Card Activity Card Component*/} 
-                {holocardCardActivities?.map((holocardCardActivity, index)=> {
-                    const credit = "credit" in holocardCardActivity ? holocardCardActivity.credit : 0;
-                    const balance = "balance" in holocardCardActivity ? holocardCardActivity.balance : 0;
-                    return(
-                    <View key={index} className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
-                        <HolocardCardActivityIcon holocardActivityTransaction={holocardCardActivity}/>
-                        <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-                            <HolocardCardActivityMainInfo holocardActivityTransaction={holocardCardActivity}/>
-                        </View>
-                        <View className="flex-1 flex-col justify-center items-start gap-0.5">
-                            <HolocardCardActivityDescription holocardActivityTransaction={holocardCardActivity}/>
-                        </View>
-                        <View className="flex flex-col justify-start items-end gap-2.5">
-                            {credit<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${((credit*-1)/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(credit/100).toFixed(2)}</Text>}
-                            <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(balance/100).toFixed(2)}</Text>
-                        </View>
-                    </View>
-                    )
-                })}
+                <HolocardActivityPreviews holocardActivities={holocardActivities}/>
             </View>
     )
+}
+
+export function HolocardActivityPreviews({ holocardActivities }: HolocardActivities){
+    return(
+        <View className="flex flex-col gap-3">
+        {holocardActivities?.map((holocardActivity)=> {
+            return(<HolocardCardActivityPreview holocardActivity={holocardActivity}/>)
+        })}
+        </View>
+    )
+}
+
+export function HolocardCardActivityPreview({holocardActivity}: HolocardActivity){
+    
+    { if(!holocardActivity){
+        return(null)
+    }
+    const credit = "credit" in holocardActivity ? holocardActivity.credit : 0;
+    const balance = "balance" in holocardActivity ? holocardActivity.balance : 0;
+    return(     
+    <View key={holocardActivity.transactionId} className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
+        <HolocardCardActivityIcon holocardActivityTransaction={holocardActivity}/>
+        <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+            <HolocardCardActivityMainInfo holocardActivityTransaction={holocardActivity}/>
+        </View>
+        <View className="flex-1 flex-col justify-center items-start gap-0.5">
+            <HolocardCardActivityDescription holocardActivityTransaction={holocardActivity}/>
+        </View>
+        <View className="flex flex-col justify-start items-end gap-2.5">
+            {credit<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${((credit*-1)/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(credit/100).toFixed(2)}</Text>}
+            <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(balance/100).toFixed(2)}</Text>
+        </View>
+    </View>
+    )
+}
 }
 
 function HolocardCardActivityIcon({holocardActivityTransaction}:HolocardCardActivityMainInfoProps){
