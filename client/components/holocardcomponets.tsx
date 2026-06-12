@@ -251,13 +251,13 @@ export function HolocardActivityPreviews({ holocardActivities }: HolocardActivit
     return(
         <View className="flex flex-col gap-3">
         {holocardActivities?.map((holocardActivity)=> {
-            return(<HolocardCardActivityPreview holocardActivity={holocardActivity}/>)
+            return(<HolocardActivityPreview holocardActivity={holocardActivity}/>)
         })}
         </View>
     )
 }
 
-export function HolocardCardActivityPreview({holocardActivity}: HolocardActivity){
+export function HolocardActivityPreview({holocardActivity}: HolocardActivity){
     
     { if(!holocardActivity){
         return(null)
