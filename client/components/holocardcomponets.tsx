@@ -83,7 +83,7 @@ export function HolocardPreview({cardName, cardType, currentBalance, currentPass
 
     return(
             <View
-                style={[cardStyles.card, {backgroundColor:"white", flexDirection:'row', padding:scale(10), gap:scale(20)}]}
+                style={[cardStyles.card, cardStyles.cardShadow, {backgroundColor:"white", flexDirection:'row', padding:scale(10), gap:scale(20)}]}
                 >
                 <Divider orientation="vertical" thickness={3} color="#D4D4D4" length={'45%'}>
                 <View style={holocardPreviewStyle.column}>
@@ -183,7 +183,7 @@ export function HolocardBalance({currentBalance, currentCaps, autoloadsInfo}:Hol
     }
 
     return(
-            <View className="flex-col px-7 py-5 gap-2.5" style={[cardStyles.card, {backgroundColor:`${Colors.HoloAccentColor}`}]}>
+            <View className="flex-col px-7 py-5 gap-2.5" style={[cardStyles.card, cardStyles.cardShadow, {backgroundColor:`${Colors.HoloAccentColor}`}]}>
                 <Text className="text-white" style={[textStyles.h1]}>Card Balance</Text>
                 <Text className="text-white" style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(96, 0.65)}]}>${(currentBalance/100).toFixed(2)}</Text>
                 {currentCaps?.map((currentCap, index)=>(
@@ -233,30 +233,6 @@ export function HolocardBalance({currentBalance, currentCaps, autoloadsInfo}:Hol
     )
 }
 
-export function HolocardActivityPreviewsSection({ holocardActivities }: HolocardActivities){
-    return(
-        <View className="flex flex-col gap-3">
-                <View className="flex-row justify-between">
-                    <Text className="text-white" style={[textStyles.h1, textStyles.bold]}>Card Activity</Text>
-                    <Pressable>
-                        <Text className="text-white" style={[textStyles.h1]}>See All</Text>
-                    </Pressable>
-                </View>
-                <HolocardActivityPreviews holocardActivities={holocardActivities}/>
-            </View>
-    )
-}
-
-export function HolocardActivityPreviews({ holocardActivities }: HolocardActivities){
-    return(
-        <View className="flex flex-col gap-3">
-        {holocardActivities?.map((holocardActivity)=> {
-            return(<HolocardActivityPreview holocardActivity={holocardActivity}/>)
-        })}
-        </View>
-    )
-}
-
 export function HolocardActivityPreview({holocardActivity}: HolocardActivity){
     
     { if(!holocardActivity){
@@ -265,7 +241,7 @@ export function HolocardActivityPreview({holocardActivity}: HolocardActivity){
     const credit = "credit" in holocardActivity ? holocardActivity.credit : 0;
     const balance = "balance" in holocardActivity ? holocardActivity.balance : 0;
     return(     
-    <View key={holocardActivity.transactionId} className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
+    <View key={holocardActivity.transactionId} className="flex flex-row p-2.5 gap-2.5 my-1.5 bg-white" style={[cardStyles.card]}>
         <HolocardCardActivityIcon holocardActivityTransaction={holocardActivity}/>
         <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
             <HolocardCardActivityMainInfo holocardActivityTransaction={holocardActivity}/>
@@ -287,7 +263,7 @@ function HolocardCardActivityIcon({holocardActivityTransaction}:HolocardCardActi
         case "Boarding":
             return <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
         case "Transfer":
-            return <MaterialCommunityIcons name="bus-multiple" size={24} color="black" />
+            return <MaterialCommunityIcons name="bus-multiple" size={50} color="black" />
         case "Load":
             return <Fontisto name="bus-ticket" size={50} color="black" />
         case "Charge":
@@ -303,8 +279,8 @@ function HolocardCardActivityIcon({holocardActivityTransaction}:HolocardCardActi
 function HolocardCardActivityMainInfo({holocardActivityTransaction}:HolocardCardActivityMainInfoProps){
     
     let BaseRender = ({transactionTitle}:{transactionTitle: string;}) => (<>
-        <Text style={[textStyles.h1, textStyles.bold]}>{transactionTitle}</Text>
-        <Text style={[textStyles.h3, textStyles.bold]}>{new Date(holocardActivityTransaction.timestamp).toLocaleString('default', {dateStyle:"short", timeStyle:"medium"})}</Text>
+        <Text style={[textStyles.h2, textStyles.bold]}>{transactionTitle}</Text>
+        <Text style={[textStyles.h4, textStyles.bold]}>{new Date(holocardActivityTransaction.timestamp).toLocaleString('default', {dateStyle:"short", timeStyle:"medium"})}</Text>
     </>)
 
     switch(holocardActivityTransaction.transactionType){

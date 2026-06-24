@@ -35,6 +35,10 @@ export const textStyles = StyleSheet.create(
         fontSize:moderateScale(20, 0.70)
 
     },
+    h4:{
+        fontFamily: "Nimbus Sans L",
+        fontSize:moderateScale(18, 0.70)
+    },
     p:{
         fontFamily:'Lato'
     },
@@ -48,10 +52,13 @@ export const cardStyles = StyleSheet.create(
         card:{
             padding:scale(10),
             borderRadius: scale(25),
-            boxShadow: '0px 4px 75px 3px rgba(0, 0, 0, 0.25)',
             width: '100%', 
             alignSelf: 'flex-start',
             overflow:"hidden",
             
+        },
+
+        cardShadow:{
+            boxShadow: '0px 4px 75px 3px rgba(0, 0, 0, 0.25)'
         }
 }) 

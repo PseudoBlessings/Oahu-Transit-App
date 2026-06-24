@@ -210,7 +210,7 @@ export const useFetchCardHistory = (transitAccountId:number, take?:number) => {
                 })
                 setcardHistory(...[parsedcardHistory])
             }catch(error){
-                console.error("Failed to fetch schedule autoloads: ", error)
+                console.error("Failed to fetch card history: ", error)
                 setError(true)
             }finally{
                 setLoading(false)

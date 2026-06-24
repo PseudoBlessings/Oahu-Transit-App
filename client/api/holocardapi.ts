@@ -39,7 +39,7 @@ async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET
         console.log("Success Message for Endpoint (", endpoint, "):", data.Success)
         console.log("Message for Endpoint (", endpoint, "):", data.Messages)
 
-        if (data.Messages[1] === "invalid session"){
+        if (data.Messages[1] === "Invalid session"){
             throw new Error("Session/Cookies are invalid, please get new ones");
         }
 

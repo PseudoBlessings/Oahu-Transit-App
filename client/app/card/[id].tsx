@@ -1,6 +1,6 @@
-import { Pressable, ScrollView, View, Text } from "react-native";
+import { Pressable, ScrollView, View, Text, FlatList } from "react-native";
 import { useContext} from 'react'
-import { HolocardBalance, HolocardInfo, HolocardActivityPreviewsSection, HolocardActivityPreviews } from "@/components/holocardcomponets";
+import { HolocardBalance, HolocardInfo, HolocardActivityPreview} from "@/components/holocardcomponets";
 import { useLocalSearchParams } from 'expo-router';
 import {HoloContext} from '@/contexts/holocontext'
 import { useFetchAutoloads, useFetchCardHistory } from "@/hooks/holo/holohooks";
@@ -38,14 +38,19 @@ const holocard = holoContext?.holocards?.find((card) => {
         <ScrollView contentContainerStyle={{paddingHorizontal:5, paddingTop:10, paddingBottom:60, gap:15}} style={{backgroundColor:`${Colors.HoloSecondaryColor}`}}>
             <HolocardInfo cardName={holocard?.cardName ?? "Holocard"} cardType={holocard?.cardType ?? ""} physicalCardId={holocard?.cardPhyscialID ?? ""}/>
             <HolocardBalance currentBalance={holocard?.balance ?? 0} currentCaps={holocard?.holocardCappingInfo} autoloadsInfo={autoloadsInfo}/>
-            <View className="flex flex-col gap-3">
+            {/* Card Activites Preview */}
+            <View className="flex flex-col">
                 <View className="flex-row justify-between">
                     <Text className="text-white" style={[textStyles.h1, textStyles.bold]}>Card Activity</Text>
                     <Pressable key={holocard?.cardId ?? 0} onPress={() => handleSeeAllActivities(holocard?.cardId ?? 0)}>
                         <Text className="text-white" style={[textStyles.h1]}>See All</Text>
                     </Pressable>
                 </View>
-                <HolocardActivityPreviews holocardActivities={cardHistory?.slice(0,3)}/>
+                <FlatList 
+                    data={cardHistory?.slice(0, 3)}
+                    renderItem={({item}) => <HolocardActivityPreview holocardActivity={item}/>}
+                    keyExtractor={item => item.transactionId}
+                />
             </View>
         </ScrollView>
     )
