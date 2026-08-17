@@ -241,7 +241,7 @@ export function HolocardActivityPreview({holocardActivity}: HolocardActivity){
     const credit = "credit" in holocardActivity ? holocardActivity.credit : 0;
     const balance = "balance" in holocardActivity ? holocardActivity.balance : 0;
     return(     
-    <View key={holocardActivity.transactionId} className="flex flex-row p-2.5 gap-2.5 my-1.5 bg-white" style={[cardStyles.card]}>
+    <View key={holocardActivity.transactionId} className="inline-flex flex-row p-0.5 gap-1.5 my-1.5 bg-white" style={[cardStyles.card]}>
         <HolocardCardActivityIcon holocardActivityTransaction={holocardActivity}/>
         <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
             <HolocardCardActivityMainInfo holocardActivityTransaction={holocardActivity}/>
@@ -280,7 +280,7 @@ function HolocardCardActivityMainInfo({holocardActivityTransaction}:HolocardCard
     
     let BaseRender = ({transactionTitle}:{transactionTitle: string;}) => (<>
         <Text style={[textStyles.h2, textStyles.bold]}>{transactionTitle}</Text>
-        <Text style={[textStyles.h4, textStyles.bold]}>{new Date(holocardActivityTransaction.timestamp).toLocaleString('default', {dateStyle:"short", timeStyle:"medium"})}</Text>
+        <Text style={[textStyles.h4, textStyles.bold]}>{new Date(holocardActivityTransaction.timestamp).toLocaleString('default', {dateStyle:"short", timeStyle:"short"})}</Text>
     </>)
 
     switch(holocardActivityTransaction.transactionType){
