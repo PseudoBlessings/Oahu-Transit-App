@@ -297,3 +297,81 @@ export interface GetAutoloadsByTransitAccountIdData{
 export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string):Promise<GetAutoloadsByTransitAccountIdData[]>{
     return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
 }
+
+export interface SaleItem{
+    Balance: number;
+    ExternalIdentifier: number;
+    FareMediaId: string;
+    FareMediaType: number;
+    FareProductId: number;
+    GroupSize: any | null;
+    Notes: string;
+    PreTaxBalance: number;
+    Price: Number;
+    PrintedCardNumber: string;
+    ProductId: number;
+    SaleItemType: number;
+    TicketName: string;
+    TransitAccountId: number;
+    ValidFrom: string | null;
+    VaildTo: string | null;
+    VanpoolGroupId: string;
+}
+export interface PointOfSale {
+    SalesChannelId: number;
+    LocationNumber: number | null;
+    DeviceNumber: number | null;
+    SalesPersonNumber: number | null;
+    MerchantId: number | null;
+    MerchantName: string;
+    MerchantRetailer: string;
+    NetworkReference: string;
+    SalesPersonEmail: string;
+    MountingPlateNumber: number | null;
+    VehicleNumber: number | null;
+}
+
+export interface Payment {
+    PaymentNumber: string;
+    Amount: number;
+    PaymentMethod: number;
+    CreditCardNetwork: number;
+    PaymentReference: string;
+    PaymentToken: string;
+    IsPreTaxPayment: boolean;
+    FundingSourceId: number;
+    BankingServiceToken: string | null;
+    PaymentProviderReference: string;
+    MaskedPan: string;
+    FareMediaId: string | null;
+    PrintedCardNumber: string | null;
+    PayPalData: any | null; // Use a specific type if you know the PayPal object structure
+}
+
+export interface getSaleBySaleTransactionIdData {
+    AssociationType: any|null;
+    CancellationDate: any|null;
+    CancellationSaleTransactionId: any|null;
+    CancelledBy: any|null;
+    ContactData: any|null;
+    CustomerAccountId: number;
+    InstitutionAccountId: any|null;
+    IsCancelled: boolean;
+    IsOrganizational: boolean;
+    JodId: any|null;
+    Notes: string;
+    OperatorId: number;
+    OrderId: any|null;
+    Payments: Payment[];
+    PointOfSale: PointOfSale;
+    ReceiptReference: string;
+    Refunds: any[] | null;
+    SaleDate: string;
+    SaleItems: SaleItem[];
+    SaleTransactionId: string;
+    SaleType: number;
+}
+
+export async function getSaleBySaleTransactionId(transactionId: string, cookies?:string):Promise<getSaleBySaleTransactionIdData>{
+    return apiRequest<getSaleBySaleTransactionIdData>("Api/CustomerAccountApi/GetSaleBySaleTransactionId", "POST", cookies, `SaleTransactionId=${transactionId}`, "application/x-www-form-urlencoded; charset=UTF-8");
+}
