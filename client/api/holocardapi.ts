@@ -321,3 +321,7 @@ export interface GetCustomerAccountByIdFundingSourcesData{
 export async function getCustomerAccountByIdFundingSources(customerAccountId:number, cookies?:string):Promise<GetCustomerAccountByIdFundingSourcesData>{
     return apiRequest<GetCustomerAccountByIdFundingSourcesData>("Api/CustomerAccountApi/GetCustomerAccountByIdFundingSources", "POST", cookies)
 }
+
+export async function getCanAddPaymentMethods(cookies?:string):Promise<boolean>{
+    return apiRequest<boolean>("api/CustomerAccountApi/GetCanAddPaymentMethods", "POST", cookies, undefined, "application/x-www-form-urlencoded; charset=UTF-8")
+}
