@@ -318,4 +318,6 @@ export interface GetCustomerAccountByIdFundingSourcesData{
     TotalCount: number;
 }
 
-export async function getCustomerAccountByIdFundingSources(customerAccountId:number, cookies?:string){
+export async function getCustomerAccountByIdFundingSources(customerAccountId:number, cookies?:string):Promise<GetCustomerAccountByIdFundingSourcesData>{
+    return apiRequest<GetCustomerAccountByIdFundingSourcesData>("Api/CustomerAccountApi/GetCustomerAccountByIdFundingSources", "POST", cookies)
+}
