@@ -297,3 +297,25 @@ export interface GetAutoloadsByTransitAccountIdData{
 export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
     return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
 }
+
+export interface GetCustomerAccountByIdFundingSourcesResult{
+    Id: number;
+    MaskedPan: string;
+    Expiry: string;
+    isDefault: boolean;
+    CardType: number;
+    FundingSourceType: number;
+    CardTypeName: string;
+    CreditCardNetwork: number;
+    Name: string;
+    IsBlocked: boolean;
+    BlockDate: any | null;
+    TransitAccountId: any | null;
+}
+
+export interface GetCustomerAccountByIdFundingSourcesData{
+    Result: GetCustomerAccountByIdFundingSourcesResult[];
+    TotalCount: number;
+}
+
+export async function getCustomerAccountByIdFundingSources(customerAccountId:number, cookies?:string){
