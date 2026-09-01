@@ -5,8 +5,19 @@ export interface APIResponse<APIResponseDataType>{
     Success: boolean;
 }
 
-async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET"|"POST", cookies?: string, body?:string, contentType?:string){
-    const hasCookies = cookies && cookies.trim().length > 0;
+async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET"|"POST", cookies?: string, params?:Record<string, string | number | undefined>, contentType?:string, requestVerficationToken?:string):Promise<APIResponseDataType>{
+    let body:string | null = null;
+    if (params) {
+        const searchParams = new URLSearchParams();
+        for (const [key, value] of Object.entries(params)) {
+            if (value !== undefined && value !== null) searchParams.set(key, String(value));
+        }
+        if (requestVerficationToken) {
+            searchParams.set("__RequestVerificationToken", requestVerficationToken);
+        }
+        body = searchParams.toString();
+    }
+
     let response:Response;
     try{
         response = await fetch(`https://www.holocard.net/umbraco/${endpoint}`, {
@@ -24,7 +35,7 @@ async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET
                 ...(cookies ? { "cookie": cookies } : {}),
                 "Referer": "https://www.holocard.net/en/customeraccount/my-cards/"
             },
-            body: body ? body : null,
+            body,
             "method": `${httpMethod}`,
             ...(cookies ? {} : {"mode": "cors"}),
             ...(cookies ? {} : {"credentials": "include"})
@@ -212,7 +223,7 @@ export interface GetTransitAccountProductsData{
 }
 
 export async function GetTransitAccountProducts(transitAccountId:number, cookies?:string):Promise<GetTransitAccountProductsData>{
-    return apiRequest<GetTransitAccountProductsData>("Api/CustomerAccountApi/GetTransitAccountProducts", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
+    return apiRequest<GetTransitAccountProductsData>("Api/CustomerAccountApi/GetTransitAccountProducts", "POST", cookies, { TransitAccountId: transitAccountId }, "application/x-www-form-urlencoded; charset=UTF-8")
 }
 
 
@@ -250,7 +261,7 @@ export interface GetTransactionHistoryData {
 }
 
 export async function getTransitHistory(transitAccountId:number, take:number = 50, cookies?:string):Promise<GetTransactionHistoryData>{
-    return apiRequest<GetTransactionHistoryData>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, `TransitAccountId=${transitAccountId}&Take=${take}`);
+    return apiRequest<GetTransactionHistoryData>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, { TransitAccountId: transitAccountId, Take: take });
 }
 
 
@@ -271,7 +282,7 @@ export interface GetCappingPotsByTransitAccountData {
 }
 
 export async function getCappingPotsbyTransitAccount(transitAccountId:number, cookies?:string):Promise<GetCappingPotsByTransitAccountData>{
-    return apiRequest<GetCappingPotsByTransitAccountData>("Api/CustomerAccountApi/GetCappingPotsByTransitAccount", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
+    return apiRequest<GetCappingPotsByTransitAccountData>("Api/CustomerAccountApi/GetCappingPotsByTransitAccount", "POST", cookies, { TransitAccountId: transitAccountId }, "application/x-www-form-urlencoded; charset=UTF-8")
 }
 
 export interface GetAutoloadsByTransitAccountIdData{
@@ -295,5 +306,5 @@ export interface GetAutoloadsByTransitAccountIdData{
 }
 
 export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
-    return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
+    return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, { TransitAccountId: transitAccountId }, "application/x-www-form-urlencoded; charset=UTF-8")
 }
