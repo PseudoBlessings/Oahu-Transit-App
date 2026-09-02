@@ -308,3 +308,36 @@ export interface GetAutoloadsByTransitAccountIdData{
 export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
     return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, { TransitAccountId: transitAccountId }, "application/x-www-form-urlencoded; charset=UTF-8")
 }
+
+export interface FundingSource{
+    BackupFundingSourceId: number | null;
+    FundingSourceId: number;
+    PartialAutoLoadValue: number;
+}
+
+export interface PostAutoloadData{
+    AutoloadLimit: any | null;
+    AutoloadResetPeriod: any | null;
+    AutoloadThresholdValue: number;
+    AutoloadValue: number;
+    BackupFundingSourceId: number | null;
+    FundingSourceId: number;
+    Id: number;
+    MultipleFundingSources: FundingSource[] | null;
+    PartialAutoLoadValue: number | null;
+    PeriodDayOfMonth: number |null;
+    PeriodRunDate: string | null;
+    SuspendedFrom: any | null;
+    SuspendedTo: any | null;
+}
+
+export async function postAutoload(ProductId:number, FundingSourceId:number, TransitAccountId:number, Value:number, requestVerificationToken:string, options:{BackupFundingSourceId?:number; PeriodDayOfMonth?:number; ThresholdValue?:number; PartialValue?:number; MultipleFundingSources?:FundingSource[]; cookies?:string} = {}):Promise<PostAutoloadData>{
+    const {BackupFundingSourceId = 0, MultipleFundingSources = [], cookies, ...rest} = options;
+    const params:Record<string, string | number | undefined> = {ProductId, FundingSourceId, TransitAccountId, Value, BackupFundingSourceId, ...rest};
+    MultipleFundingSources.forEach((s, i) => Object.assign(params, {
+        [`MultipleFundingSources[${i}][PartialAutoloadValue]`]: s.PartialAutoLoadValue,
+        [`MultipleFundingSources[${i}][FundingSourceId]`]: s.FundingSourceId,
+        [`MultipleFundingSources[${i}][BackupFundingSourceId]`]: s.BackupFundingSourceId ?? 0,
+    }));
+    return apiRequest<PostAutoloadData>("Api/ProductsApi/PostAutoload", "POST", cookies, params, "application/x-www-form-urlencoded; charset=UTF-8", requestVerificationToken)
+}
