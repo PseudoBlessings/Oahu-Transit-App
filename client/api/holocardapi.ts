@@ -341,3 +341,9 @@ export async function postAutoload(ProductId:number, FundingSourceId:number, Tra
     }));
     return apiRequest<PostAutoloadData>("Api/ProductsApi/PostAutoload", "POST", cookies, params, "application/x-www-form-urlencoded; charset=UTF-8", requestVerificationToken)
 }
+
+
+
+export async function deleteAutoload(AutoloadId:number, ProductId:number, requestVerificationToken:string, cookies?:string):Promise<void>{
+    return apiRequest<void>("Api/ProductsApi/DeleteAutoload", "POST", cookies, {AutoloadId, ProductId}, "application/x-www-form-urlencoded; charset=UTF-8", requestVerificationToken)
+}
