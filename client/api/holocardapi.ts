@@ -334,6 +334,7 @@ export interface GetCustomerAccountByIdFundingSourcesData{
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export async function getCustomerAccountByIdFundingSources(customerAccountId:number, cookies?:string){
 >>>>>>> 7c625bf (Added Interfaces for GetCustomerAccountByIdFundingSources)
 =======
@@ -348,3 +349,12 @@ export async function getCanAddPaymentMethods(cookies?:string):Promise<boolean>{
     return apiRequest<boolean>("api/CustomerAccountApi/GetCanAddPaymentMethods", "POST", cookies, undefined, "application/x-www-form-urlencoded; charset=UTF-8")
 }
 >>>>>>> 2e81f6e (Added getCanAddPaymentMethods function)
+=======
+export async function getCustomerAccountByIdFundingSources(customerAccountId:number, cookies?:string):Promise<GetCustomerAccountByIdFundingSourcesData>{
+    return apiRequest<GetCustomerAccountByIdFundingSourcesData>("Api/CustomerAccountApi/GetCustomerAccountByIdFundingSources", "POST", cookies)
+}
+
+export async function getCanAddPaymentMethods(cookies?:string):Promise<boolean>{
+    return apiRequest<boolean>("api/CustomerAccountApi/GetCanAddPaymentMethods", "POST", cookies, undefined, "application/x-www-form-urlencoded; charset=UTF-8")
+}
+>>>>>>> 2e81f6ed431f43afd0541fd4bb752a6ac2cf8a31
