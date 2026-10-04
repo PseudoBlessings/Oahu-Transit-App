@@ -117,8 +117,8 @@ export type Transaction =
 
     export interface PaymentDetail{
         // PaymentName: string; add later, will need another the API call GetCustomerAccountByIdFundingSources to find the name
-        PaymentMethod: PaymentMethodType;
-        CreditCard: CreditCardType;
+        PaymentMethod: PaymentMethodType| (number & {});
+        CreditCard: CreditCardType| (number & {});
         CreditCardNumber: string;
         Amount: number; // amount taken out or put in to the payment
         ItemId: string;
