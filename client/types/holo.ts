@@ -1,3 +1,4 @@
+
 export interface HolocardCappingInfo{
     Name: string;
     ValidFrom: string; // ISO 8601 Date string
@@ -93,3 +94,37 @@ export type Transaction =
     | UseTransaction
     | FareMediaTransaction
     | EightyThreeTransaction
+
+    export const PaymentMethodMap = {
+    2: "Credit Card",
+    261: "Invoice",
+    264: "ACH"
+    } as const;
+
+    export type PaymentMethodType = keyof typeof PaymentMethodMap;
+
+
+
+    export const CreditCardNetwork = {
+        0 : "Visa",
+        1 : "Mastercard",
+        2 : "American Express",
+        3 : "Discover",
+        4 : "Credit Card"
+    } as const
+
+    export type CreditCardType = keyof typeof CreditCardNetwork;
+
+    export interface TransactionDetails{
+        Notes: string
+        Price: number;
+        RecieptReference: string;
+        Timestamp: string; // ISO 8601 String
+        AffectedCard: string | null;
+        TransactionName: string;
+        PaymentMethod: PaymentMethodType;
+        CreditCard: CreditCardType;
+        CreditCardNumber: string;
+        // PurchaseLocation : PurchaseLocationType Will do later
+        Status: string;
+    }
