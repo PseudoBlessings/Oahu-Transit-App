@@ -121,7 +121,7 @@ export type Transaction =
         CreditCard: CreditCardType| (number & {});
         CreditCardNumber: string;
         Amount: number; // amount taken out or put in to the payment
-        ItemId: string;
+        ItemId: string | null;
     }
 
     export interface ItemDetail{
