@@ -129,7 +129,7 @@ export type Transaction =
         ItemId: string;
         CardBalanceAfter: number;
         Price: number;
-        CardId:number;
+        CardId:string;
     }
     
     export interface TransactionDetails{
