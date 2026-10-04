@@ -138,5 +138,4 @@ export type Transaction =
         ItemDetails: ItemDetail[];
         PaymentDetails: PaymentDetail[];
         // PurchaseLocation : PurchaseLocationType Will do later
-        Status: string;
     }
