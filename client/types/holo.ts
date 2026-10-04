@@ -121,7 +121,7 @@ export type Transaction =
         CreditCard: CreditCardType;
         CreditCardNumber: string;
         Amount: number; // amount taken out or put in to the payment
-        ItemId: string | string[];
+        ItemId: string;
     }
 
     export interface ItemDetail{
@@ -136,7 +136,6 @@ export type Transaction =
     export interface TransactionDetails{
         RecieptReference: string;
         Timestamp: string; // ISO 8601 String
-        TransactionName: string;
         ItemDetails: ItemDetail[];
         PaymentDetails: PaymentDetail[];
         // PurchaseLocation : PurchaseLocationType Will do later
