@@ -116,7 +116,7 @@ export type Transaction =
     export type CreditCardType = keyof typeof CreditCardNetwork;
 
     export interface PaymentDetail{
-        PaymentName: string;
+        // PaymentName: string; add later, will need another the API call GetCustomerAccountByIdFundingSources to find the name
         PaymentMethod: PaymentMethodType;
         CreditCard: CreditCardType;
         CreditCardNumber: string;
