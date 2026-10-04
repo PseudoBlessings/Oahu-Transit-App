@@ -128,7 +128,6 @@ export type Transaction =
         ItemName:string;
         ItemId: string;
         CardBalanceAfter: number;
-        CardBalanceBefore: number;
         Price: number;
         CardId:number;
     }
