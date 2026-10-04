@@ -307,7 +307,7 @@ export interface SaleItem{
     GroupSize: any | null;
     Notes: string;
     PreTaxBalance: number;
-    Price: Number;
+    Price: number;
     PrintedCardNumber: string;
     ProductId: number;
     SaleItemType: number;
