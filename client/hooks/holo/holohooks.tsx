@@ -1,6 +1,6 @@
-import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts, CapingPotResult, getAutoloadsByTransitAccountId, getTransitHistory } from "@/api/holocardapi";
+import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts, CapingPotResult, getAutoloadsByTransitAccountId, getTransitHistory, getSaleBySaleTransactionId } from "@/api/holocardapi";
 import { HoloAuthContext } from "@/contexts/holoauthcontext";
-import { BaseHolocardTransaction, BoardingTransaction, HoloAccountInfo, HolocardAutoloadInfo, HolocardInfo, Transaction } from "@/types/holo"
+import { BaseHolocardTransaction, BoardingTransaction, HoloAccountInfo, HolocardAutoloadInfo, HolocardInfo, ItemDetail, PaymentDetail, Transaction, TransactionDetails } from "@/types/holo"
 import { useContext, useEffect, useState } from "react";
 
 export const useFetchAccount = () => {
@@ -220,4 +220,55 @@ export const useFetchCardHistory = (transitAccountId:number, take?:number) => {
     }, [])
     
     return{cardHistory, loading, error}
+}
+
+export const useFetchTransactionInfo = (transactionId: string) => {
+    const [transactionInfo, setTransactionInfo] = useState<TransactionDetails | undefined>(undefined);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const holoAuth = useContext(HoloAuthContext);
+
+    const getTransactionInfo = useEffect(() => {
+        const getTransactionInfoData = async () => {
+            if (!holoAuth?.session || !holoAuth.holoAccessGranted) {
+                setLoading(false);
+                return;
+            }try{
+                const transactionInfo = await getSaleBySaleTransactionId(transactionId);
+                const itemDetails:ItemDetail[] = transactionInfo.SaleItems.map((saleItem, index) => (
+                    {
+                    ItemName: saleItem.TicketName,
+                    ItemId: saleItem.FareMediaId,
+                    CardBalanceAfter: saleItem.Balance,
+                    Price: saleItem.Price,
+                    CardId: saleItem.PrintedCardNumber
+                    }
+                )); 
+                const paymentDetails:PaymentDetail[] = transactionInfo.Payments.map((payment, index) => ({
+                    // PaymentName: string; add later, will need another the API call GetCustomerAccountByIdFundingSources to find the name
+                    PaymentMethod: payment.PaymentMethod,
+                    CreditCard: payment.CreditCardNetwork,
+                    CreditCardNumber: payment.MaskedPan,
+                    Amount: payment.Amount, // amount taken out or put in to the payment
+                    ItemId: payment.FareMediaId ? payment.FareMediaId : null //assuming the mediafare id will link to what payment was used for what item
+                }))
+                const parsedTransactionInfo:TransactionDetails = {
+                            RecieptReference: transactionInfo.ReceiptReference,
+                            Timestamp: transactionInfo.SaleDate,
+                            ItemDetails : itemDetails, 
+                            PaymentDetails: paymentDetails,
+                            // PurchaseLocation : PurchaseLocationType Will do later
+                }
+                setTransactionInfo(parsedTransactionInfo);
+            }catch(error){
+                console.error("Failed to fetch transaction info(", transactionId, "): ", error)
+                setError(true);
+            }finally{
+                setLoading(false)
+            }
+        }
+    getTransactionInfoData();
+    }, [])
+    return {transactionInfo, loading, error}
 }
