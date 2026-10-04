@@ -115,16 +115,30 @@ export type Transaction =
 
     export type CreditCardType = keyof typeof CreditCardNetwork;
 
-    export interface TransactionDetails{
-        Notes: string
-        Price: number;
-        RecieptReference: string;
-        Timestamp: string; // ISO 8601 String
-        AffectedCard: string | null;
-        TransactionName: string;
+    export interface PaymentDetail{
+        PaymentName: string;
         PaymentMethod: PaymentMethodType;
         CreditCard: CreditCardType;
         CreditCardNumber: string;
+        Amount: number; // amount taken out or put in to the payment
+        ItemId: string | string[];
+    }
+
+    export interface ItemDetail{
+        ItemName:string;
+        ItemId: string;
+        CardBalanceAfter: number;
+        CardBalanceBefore: number;
+        Price: number;
+        CardId:number;
+    }
+    
+    export interface TransactionDetails{
+        RecieptReference: string;
+        Timestamp: string; // ISO 8601 String
+        TransactionName: string;
+        ItemDetails: ItemDetail[];
+        PaymentDetails: PaymentDetail[];
         // PurchaseLocation : PurchaseLocationType Will do later
         Status: string;
     }
