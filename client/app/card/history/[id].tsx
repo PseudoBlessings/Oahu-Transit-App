@@ -26,7 +26,7 @@ export default function CardActivities(){
     const router = useRouter();
     const handleViewTransaction = (transactionID: string) =>{
         router.push({
-        pathname: "../card/transaction/[id]",
+        pathname: "../transaction/[id]",
         params: { id: transactionID }
         });
     }
@@ -54,11 +54,8 @@ export default function CardActivities(){
         <FlatList
             className="flex flex-col g-3" 
             data={cardHistory}
-            renderItem={({item}) => /**
-                * TODO
-                * Implement Pressable button and link the item transactionId to it.
-                */     
-            <Pressable key={item.transactionId ?? 0} onPress={() => handleViewTransaction(item.transactionId ?? 0)}>
+            renderItem={({item}) =>
+            <Pressable key={item.transactionId ?? 0} onPress={() => handleViewTransaction(item.transactionId ?? "0")}>
                 <HolocardActivityPreview holocardActivity={item}/>
             </Pressable>}
             keyExtractor={item => item.transactionId}/>
