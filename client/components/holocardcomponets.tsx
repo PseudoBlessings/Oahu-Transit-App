@@ -384,7 +384,7 @@ export function HolocardTransactionDetails({holocardTransactionDetails}:Holocard
                 <View className="flex-col">
                     {(holocardTransactionDetails.PaymentDetails.length) ?
                     holocardTransactionDetails.PaymentDetails.map((paymentDetail, index)=>
-                    <HolocardPaymentDetails PaymentNumber={paymentDetail.CreditCardNumber} Name=""/>
+                    <HolocardPaymentDetails PaymentNumber={paymentDetail.CreditCardNumber} Name="" isCard={paymentDetail.PaymentMethod === 2? true : false}/>
                     ):
                     <>
                     {/**<HolocardTravelDetails/> Need to readjust the TransactionDetails/HolocardTransactionDetailsProps to include some travel details*/}
