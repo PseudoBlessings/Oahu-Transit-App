@@ -8,7 +8,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Fontisto from '@expo/vector-icons/Fontisto';
-import { HolocardAutoloadInfo, HolocardCappingInfo, Transaction } from "@/types/holo";
+import { HolocardAutoloadInfo, HolocardCappingInfo, Transaction, TransactionDetails } from "@/types/holo";
 
 export interface HolocardPreviewProps{
     cardName:string;
@@ -43,11 +43,38 @@ export interface HolocardActivity{
     holocardActivity?:Transaction
 }
 
+export interface HolocardTransactionDetails{
+    holocardTransactionDetails:TransactionDetails
+}
+
 export interface HolocardCardActivityTransactionProps{
     holocardActivityTransaction:Transaction
 }
 export interface HolocardCardActivityMainInfoProps{
     holocardActivityTransaction:Transaction
+}
+
+export interface HolocardTransactionDetailsProps{
+    holocardTransactionDetails:TransactionDetails
+}
+
+export interface HolocardTransactionDetailHeaderProps{
+    Name: string;
+    Date: string;
+    Amount: number;
+    Balance:number;
+}
+
+export interface HolocardTravelDetailsProps{
+    Stop: string;
+    VehicleNumber: string;
+    Route: string;
+}
+
+export interface HolocardPaymentDetailsProps{
+    isCard?:boolean;
+    Name:string;
+    PaymentNumber: string;
 }
 
 const holocardPreviewStyle = StyleSheet.create({
@@ -345,4 +372,86 @@ Valid to: ${new Date(holocardActivityTransaction.validTo ?? "").toLocaleString('
         case "83":
             return
     }
+}
+
+export function HolocardTransactionDetails({holocardTransactionDetails}:HolocardTransactionDetailsProps){
+    return(
+        holocardTransactionDetails.ItemDetails.map((itemDetail, index) => (
+            <View style={[cardStyles.card, cardStyles.cardShadow]} className="flex-col gap-3 !p-3 bg-white">
+                <View className="flex-row justify-between">
+                    <HolocardTransactionDetailHeader Name={itemDetail.ItemName} Date={holocardTransactionDetails.Timestamp} Amount={itemDetail.Price} Balance={itemDetail.CardBalanceAfter}/>
+                </View>
+                <View className="flex-col">
+                    {(holocardTransactionDetails.PaymentDetails.length) ?
+                    holocardTransactionDetails.PaymentDetails.map((paymentDetail, index)=>
+                    <HolocardPaymentDetails PaymentNumber={paymentDetail.CreditCardNumber} Name=""/>
+                    ):
+                    <>
+                    {/**<HolocardTravelDetails/> Need to readjust the TransactionDetails/HolocardTransactionDetailsProps to include some travel details*/}
+                    </>
+                    }
+                </View>
+            </View>
+        ))
+    )
+}
+
+function HolocardTransactionDetailHeader({Name, Date: date, Amount, Balance}:HolocardTransactionDetailHeaderProps){
+    return(
+        <>
+            {/** Transaction Name & Date */}
+                <View className="flex-col">
+                    <Text style={[textStyles.h1, textStyles.bold]}>{Name}</Text>
+                    <Text style={[textStyles.h2, textStyles.bold]}>{new Date(date).toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric', timeStyle:"short"} )}</Text>
+                </View>
+                {/** Transaction Amount & Balance */}
+                <View className="flex-col">
+                    <Text className="text-right" style={[textStyles.h1, textStyles.bold]}>{Amount<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${((Amount*-1)/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(Amount/100).toFixed(2)}</Text>}</Text>
+                    <Text className="text-right" style={[textStyles.h2, textStyles.bold]}>Balance: ${(Balance/100).toFixed(2)}</Text>
+                </View>
+        </>
+    )
+}
+
+function HolocardTravelDetails({Route, Stop, VehicleNumber}:HolocardTravelDetailsProps){
+    return(
+        <>
+            {/* <Map></Map> Add a pin in a google map of this location*/}
+            <Text style={[textStyles.h2]}>Stop: {Stop}</Text>
+            <Text style={[textStyles.h2]}>Vehicle #: {VehicleNumber}</Text>
+            <Text style={[textStyles.h2]}>Route: {Route}</Text>
+        </>
+    )
+}
+
+function HolocardPaymentDetails({Name, isCard, PaymentNumber}:HolocardPaymentDetailsProps){
+    return(
+        <View className="flex-col">
+            {isCard ? <HolocardCardPaymentDetails Name={Name} PaymentNumber={PaymentNumber}/> : <HolocardACHPaymentDetails Name={Name} PaymentNumber={PaymentNumber}/>}
+        </View>
+    )
+}
+
+function HolocardCardPaymentDetails({Name, PaymentNumber}:HolocardPaymentDetailsProps){
+    return(
+        <View className="p-3 gap-2 flex-col rounded-xl border-black border-8 bg-white">
+            <View className="flex-row justify-between"> 
+                <Text style={[textStyles.h1, textStyles.bold]}>{Name}</Text>
+                <Image className="w-12 h-12" source={{uri: "https://img.icons8.com/?size=100&id=106551&format=png&color=000000"}}/>
+            </View>
+            <Image className="w-12 h-12" source={{uri: "https://img.icons8.com/?size=100&id=3559&format=png&color=000000"}}/>
+            <Text className="text-center" style={[textStyles.h1, textStyles.bold]}>{PaymentNumber}</Text>
+            <Image className="w-12 h-12"/>
+        </View>
+    )
+}
+
+function HolocardACHPaymentDetails({Name, PaymentNumber}:HolocardPaymentDetailsProps){
+    return(
+        <View className="flex-col p-3 gap-1">
+            <Text className="text-center" style={[textStyles.h1, textStyles.bold]}>{Name}</Text>
+            <Image className="w-full aspect-square" source={{uri: "https://img.icons8.com/?size=500&id=77054&format=png&color=000000"}}/>
+            <Text className="text-center" style={[textStyles.h1, textStyles.bold]}>{PaymentNumber}</Text>
+        </View>
+    )
 }
