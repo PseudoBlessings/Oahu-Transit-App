@@ -8,11 +8,10 @@ import {HolocardTransactionDetails} from "@/components/holocardcomponets"
 
 
 export default function TransactionDetails(){
-    const { rawId } = useLocalSearchParams(); // transactional id
-    const id = Array.isArray(rawId) ? rawId[0] : rawId;
-    const holoContext = useContext(HoloContext);
+    const { id } = useLocalSearchParams<{ id: string }>();
+    const transactionId = Array.isArray(id) ? id[0] : id;
 
-    const {transactionInfo, loading, error} = useFetchTransactionInfo(id)
+    const {transactionInfo, loading, error} = useFetchTransactionInfo(transactionId)
 
 
     return(
