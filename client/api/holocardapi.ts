@@ -330,7 +330,7 @@ export interface GetCustomerAccountByIdFundingSourcesData{
 }
 
 export async function getCustomerAccountByIdFundingSources(customerAccountId:number, cookies?:string):Promise<GetCustomerAccountByIdFundingSourcesData>{
-    return apiRequest<GetCustomerAccountByIdFundingSourcesData>("Api/CustomerAccountApi/GetCustomerAccountByIdFundingSources", "POST", cookies)
+    return apiRequest<GetCustomerAccountByIdFundingSourcesData>("Api/CustomerAccountApi/GetCustomerAccountByIdFundingSources","POST", cookies, { CustomerAccountId: customerAccountId }, "application/x-www-form-urlencoded; charset=UTF-8")
 }
 
 export async function getCanAddPaymentMethods(cookies?:string):Promise<boolean>{
