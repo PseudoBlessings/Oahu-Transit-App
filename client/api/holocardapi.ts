@@ -39,7 +39,7 @@ async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET
         console.log("Success Message for Endpoint (", endpoint, "):", data.Success)
         console.log("Message for Endpoint (", endpoint, "):", data.Messages)
 
-        if (data.Messages[1] === "invalid session"){
+        if (data.Messages[1] === "Invalid session"){
             throw new Error("Session/Cookies are invalid, please get new ones");
         }
 
@@ -217,31 +217,31 @@ export async function GetTransitAccountProducts(transitAccountId:number, cookies
 
 
 export interface Transaction {
-    AppliedCapping: any | null;
-    DeviceNumber: number;
-    LineName: string;
-    LineNumber: number;
-    NumberOfPersons: number;
+    AppliedCapping: string | null;
+    DeviceNumber: number | null;
+    LineName: string | null;
+    LineNumber: number | null;
+    NumberOfPersons: number | null;
     OperatorId: number;
-    PurseBalance: number;
+    PurseBalance: number | null;
     PurseBalancePreTax: number | null;
-    PurseCredit: number;
+    PurseCredit: number | null;
     PurseCreditPreTax: number | null;
-    Result: string;
-    ResultId: number;
-    SalesChannelId: number;
+    Result: "Ok" | "ErrorInsufficientCredit" | "ErrorController" | "ErrorCiAlreadyDenied" | string;
+    ResultId: number | null;
+    SalesChannelId: number | null;
     SalesChannel: string | null;
-    StopName: string;
-    StopNumber: number;
+    StopName: string | null;
+    StopNumber: number | null;
     TicketExternalNumber: number;
     TicketName: string;
     Timestamp: string; // ISO 8601 Date string
-    TransactionId: string;
-    TransactionType: string;
+    TransactionId: string; // UUID
+    TransactionType: "Boarding" | "Charge" | "Transfer" | "Use" | "83" | "FareMediaSale" | "Load" | string ;
     TransactionTypeId: number;
-    ValidFrom: string;  // ISO 8601 Date string
-    ValidTo: string;    // ISO 8601 Date string
-    VehicleNumber: number;
+    ValidFrom: string | null;  // ISO 8601 Date string
+    ValidTo: string | null;    // ISO 8601 Date string
+    VehicleNumber: number | null;
 }
 
 export interface GetTransactionHistoryData {
@@ -249,8 +249,8 @@ export interface GetTransactionHistoryData {
     RetailLocation: any | null;
 }
 
-export async function getTransitHistory(transitAccountId:number, take:number = 50, cookies?:string):Promise<GetTransactionHistoryData>{
-    return apiRequest<GetTransactionHistoryData>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, `TransitAccountId=${transitAccountId}&Take=${take}`);
+export async function getTransitHistory(transitAccountId:number, take:number = 50, cookies?:string):Promise<GetTransactionHistoryData[]>{
+    return apiRequest<GetTransactionHistoryData[]>("Api/CustomerAccountApi/GetTransactionHistory", "POST", cookies, `TransitAccountId=${transitAccountId}&Take=${take}`, "application/x-www-form-urlencoded; charset=UTF-8");
 }
 
 
@@ -294,6 +294,84 @@ export interface GetAutoloadsByTransitAccountIdData{
     AutoloadResetPeriod: number | null;
 }
 
-export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
+export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string):Promise<GetAutoloadsByTransitAccountIdData[]>{
     return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
+}
+
+export interface SaleItem{
+    Balance: number;
+    ExternalIdentifier: number;
+    FareMediaId: string;
+    FareMediaType: number;
+    FareProductId: number;
+    GroupSize: any | null;
+    Notes: string;
+    PreTaxBalance: number;
+    Price: number;
+    PrintedCardNumber: string;
+    ProductId: number;
+    SaleItemType: number;
+    TicketName: string;
+    TransitAccountId: number;
+    ValidFrom: string | null;
+    VaildTo: string | null;
+    VanpoolGroupId: string;
+}
+export interface PointOfSale {
+    SalesChannelId: number;
+    LocationNumber: number | null;
+    DeviceNumber: number | null;
+    SalesPersonNumber: number | null;
+    MerchantId: number | null;
+    MerchantName: string;
+    MerchantRetailer: string;
+    NetworkReference: string;
+    SalesPersonEmail: string;
+    MountingPlateNumber: number | null;
+    VehicleNumber: number | null;
+}
+
+export interface Payment {
+    PaymentNumber: string;
+    Amount: number;
+    PaymentMethod: number;
+    CreditCardNetwork: number;
+    PaymentReference: string;
+    PaymentToken: string;
+    IsPreTaxPayment: boolean;
+    FundingSourceId: number;
+    BankingServiceToken: string | null;
+    PaymentProviderReference: string;
+    MaskedPan: string;
+    FareMediaId: string | null;
+    PrintedCardNumber: string | null;
+    PayPalData: any | null; // Use a specific type if you know the PayPal object structure
+}
+
+export interface getSaleBySaleTransactionIdData {
+    AssociationType: any|null;
+    CancellationDate: any|null;
+    CancellationSaleTransactionId: any|null;
+    CancelledBy: any|null;
+    ContactData: any|null;
+    CustomerAccountId: number;
+    InstitutionAccountId: any|null;
+    IsCancelled: boolean;
+    IsOrganizational: boolean;
+    JodId: any|null;
+    Notes: string;
+    OperatorId: number;
+    OrderId: any|null;
+    Payments: Payment[];
+    PointOfSale: PointOfSale;
+    ReceiptReference: string;
+    Refunds: any[] | null;
+    SaleDate: string;
+    SaleItems: SaleItem[];
+    SaleTransactionId: string;
+    SaleType: number;
+}
+
+export async function getSaleBySaleTransactionId(transactionId: string, cookies?:string):Promise<getSaleBySaleTransactionIdData>{
+    return apiRequest<getSaleBySaleTransactionIdData>("Api/CustomerAccountApi/GetSaleBySaleTransactionId", "POST", cookies, `SaleTransactionId=${transactionId}`, "application/x-www-form-urlencoded; charset=UTF-8");
 }

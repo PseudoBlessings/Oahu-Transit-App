@@ -1,6 +1,6 @@
-import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts, CapingPotResult, getAutoloadsByTransitAccountId } from "@/api/holocardapi";
+import { getCappingPotsbyTransitAccount, getCurrentCustomerAccount, getTransitAccount, GetTransitAccountProducts, CapingPotResult, getAutoloadsByTransitAccountId, getTransitHistory, getSaleBySaleTransactionId } from "@/api/holocardapi";
 import { HoloAuthContext } from "@/contexts/holoauthcontext";
-import { HoloAccountInfo, HolocardAutoloadInfo, HolocardInfo } from "@/types/holo"
+import { BaseHolocardTransaction, BoardingTransaction, HoloAccountInfo, HolocardAutoloadInfo, HolocardInfo, ItemDetail, PaymentDetail, Transaction, TransactionDetails } from "@/types/holo"
 import { useContext, useEffect, useState } from "react";
 
 export const useFetchAccount = () => {
@@ -164,4 +164,111 @@ export const useFetchAutoloads = (transitAccountId:number) => {
     getAutoloadsInfo();
     },[transitAccountId, holoAuth])
     return {autoloadsInfo, loading, error}
+}
+
+export const useFetchCardHistory = (transitAccountId:number, take?:number) => {
+
+    const [cardHistory, setcardHistory] = useState<Transaction[] | undefined>(undefined);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const holoAuth = useContext(HoloAuthContext);
+
+    const getCardHistory = useEffect(()=>{
+
+            const getCardHistoryData = async () => {
+                if (!holoAuth?.session || !holoAuth.holoAccessGranted) {
+                setLoading(false);
+                return;
+            }
+            try{
+                const cardHistory = await getTransitHistory(transitAccountId, take);
+                const parsedcardHistory:Transaction[] = cardHistory.map((transaction, index) => {
+                    const base = {
+                        cardId: transitAccountId,
+                        transactionId: transaction.Transaction.TransactionId,
+                        trasactionName: transaction.Transaction.TicketName,
+                        timestamp: transaction.Transaction.Timestamp,
+                        result: transaction.Transaction.Result,
+                        transactionType: transaction.Transaction.TransactionType
+                    }
+
+                    const finance = {
+                            balance: transaction.Transaction.PurseBalance ?? 0,
+                            credit: transaction.Transaction.PurseCredit ?? 0,
+                    }
+
+                    const travel = {
+                        stopName: transaction.Transaction.StopName,
+                        vehicleNumber: transaction.Transaction.VehicleNumber,
+                        lineName: transaction.Transaction.LineName,
+                        validFrom: transaction.Transaction.ValidFrom,
+                        validTo: transaction.Transaction.ValidTo
+                    }
+
+                    return{...base, ...finance, ...travel} as Transaction
+                })
+                setcardHistory(...[parsedcardHistory])
+            }catch(error){
+                console.error("Failed to fetch card history: ", error)
+                setError(true)
+            }finally{
+                setLoading(false)
+            }
+        }
+        getCardHistoryData()
+    }, [])
+    
+    return{cardHistory, loading, error}
+}
+
+export const useFetchTransactionInfo = (transactionId: string) => {
+    const [transactionInfo, setTransactionInfo] = useState<TransactionDetails | undefined>(undefined);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const holoAuth = useContext(HoloAuthContext);
+
+    const getTransactionInfo = useEffect(() => {
+        const getTransactionInfoData = async () => {
+            if (!holoAuth?.session || !holoAuth.holoAccessGranted) {
+                setLoading(false);
+                return;
+            }try{
+                const transactionInfo = await getSaleBySaleTransactionId(transactionId);
+                const itemDetails:ItemDetail[] = transactionInfo.SaleItems.map((saleItem, index) => (
+                    {
+                    ItemName: saleItem.TicketName,
+                    ItemId: saleItem.FareMediaId,
+                    CardBalanceAfter: saleItem.Balance,
+                    Price: saleItem.Price,
+                    CardId: saleItem.PrintedCardNumber
+                    }
+                )); 
+                const paymentDetails:PaymentDetail[] = transactionInfo.Payments.map((payment, index) => ({
+                    // PaymentName: string; add later, will need another the API call GetCustomerAccountByIdFundingSources to find the name
+                    PaymentMethod: payment.PaymentMethod,
+                    CreditCard: payment.CreditCardNetwork,
+                    CreditCardNumber: payment.MaskedPan,
+                    Amount: payment.Amount, // amount taken out or put in to the payment
+                    ItemId: payment.FareMediaId ? payment.FareMediaId : null //assuming the mediafare id will link to what payment was used for what item
+                }))
+                const parsedTransactionInfo:TransactionDetails = {
+                            RecieptReference: transactionInfo.ReceiptReference,
+                            Timestamp: transactionInfo.SaleDate,
+                            ItemDetails : itemDetails, 
+                            PaymentDetails: paymentDetails,
+                            // PurchaseLocation : PurchaseLocationType Will do later
+                }
+                setTransactionInfo(parsedTransactionInfo);
+            }catch(error){
+                console.error("Failed to fetch transaction info(", transactionId, "): ", error)
+                setError(true);
+            }finally{
+                setLoading(false)
+            }
+        }
+    getTransactionInfoData();
+    }, [])
+    return {transactionInfo, loading, error}
 }
