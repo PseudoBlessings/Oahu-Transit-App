@@ -55,7 +55,8 @@ export interface HolocardCardActivityMainInfoProps{
 }
 
 export interface HolocardTransactionDetailsProps{
-    holocardTransactionDetails:TransactionDetails
+    holocardTransactionDetails:TransactionDetails | null | undefined
+    holocardActivityTransaction:Transaction | null | undefined
 }
 
 export interface HolocardTransactionDetailHeaderProps{
@@ -67,7 +68,7 @@ export interface HolocardTransactionDetailHeaderProps{
 
 export interface HolocardTravelDetailsProps{
     Stop: string;
-    VehicleNumber: string;
+    VehicleNumber: number;
     Route: string;
 }
 
@@ -374,10 +375,11 @@ Valid to: ${new Date(holocardActivityTransaction.validTo ?? "").toLocaleString('
     }
 }
 
-export function HolocardTransactionDetails({holocardTransactionDetails}:HolocardTransactionDetailsProps){
+export function HolocardTransactionDetails({holocardTransactionDetails, holocardActivityTransaction}:HolocardTransactionDetailsProps){
     return(
-        holocardTransactionDetails.ItemDetails.map((itemDetail, index) => (
-            <View style={[cardStyles.card, cardStyles.cardShadow]} className="flex-col gap-3 !p-3 bg-white">
+        <View style={[cardStyles.card, cardStyles.cardShadow]} className="flex-col gap-3 !p-3 bg-white">{
+        holocardTransactionDetails ? holocardTransactionDetails.ItemDetails.map((itemDetail, index) => (
+            <>
                 <View className="flex-row justify-between">
                     <HolocardTransactionDetailHeader Name={itemDetail.ItemName} Date={holocardTransactionDetails.Timestamp} Amount={itemDetail.Price} Balance={itemDetail.CardBalanceAfter}/>
                 </View>
@@ -385,14 +387,12 @@ export function HolocardTransactionDetails({holocardTransactionDetails}:Holocard
                     {(holocardTransactionDetails.PaymentDetails.length) ?
                     holocardTransactionDetails.PaymentDetails.map((paymentDetail, index)=>
                     <HolocardPaymentDetails PaymentNumber={paymentDetail.CreditCardNumber} Name="" isCard={paymentDetail.PaymentMethod === 2? true : false}/>
-                    ):
-                    <>
-                    {/**<HolocardTravelDetails/> Need to readjust the TransactionDetails/HolocardTransactionDetailsProps to include some travel details*/}
-                    </>
+                    ):(holocardActivityTransaction?.transactionType === "Boarding"?<HolocardTravelDetails VehicleNumber={holocardActivityTransaction.vehicleNumber} Stop={holocardActivityTransaction.stopName} Route={holocardActivityTransaction.lineName}/>: <></>)
                     }
                 </View>
-            </View>
-        ))
+            </>
+        )): holocardActivityTransaction?.transactionType === "Boarding"?<HolocardTravelDetails VehicleNumber={holocardActivityTransaction.vehicleNumber} Stop={holocardActivityTransaction.stopName} Route={holocardActivityTransaction.lineName}/>: <></>}
+        </View>
     )
 }
 

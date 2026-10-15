@@ -24,10 +24,10 @@ export default function CardActivities(){
     const { id } = useLocalSearchParams();
     const holoContext = useContext(HoloContext);
     const router = useRouter();
-    const handleViewTransaction = (transactionID: string) =>{
+    const handleViewTransaction = (transactionID: string, Transaction: Transaction) =>{
         router.push({
         pathname: "../transaction/[id]",
-        params: { id: transactionID }
+        params: { id: transactionID, cardActivityDetailsString: JSON.stringify(Transaction)}
         });
     }
 
@@ -55,7 +55,7 @@ export default function CardActivities(){
             className="flex flex-col g-3" 
             data={cardHistory}
             renderItem={({item}) =>
-            <Pressable key={item.transactionId ?? 0} onPress={() => handleViewTransaction(item.transactionId ?? "0")}>
+            <Pressable key={item.transactionId ?? 0} onPress={() => handleViewTransaction(item.transactionId ?? "0", item)}>
                 <HolocardActivityPreview holocardActivity={item}/>
             </Pressable>}
             keyExtractor={item => item.transactionId}/>
