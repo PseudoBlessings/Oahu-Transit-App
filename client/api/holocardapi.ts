@@ -305,8 +305,8 @@ export interface GetAutoloadsByTransitAccountIdData{
     AutoloadResetPeriod: number | null;
 }
 
-export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string):Promise<GetAutoloadsByTransitAccountIdData[]>{
-    return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, `TransitAccountId=${transitAccountId}`, "application/x-www-form-urlencoded; charset=UTF-8")
+export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
+    return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, { TransitAccountId: transitAccountId }, "application/x-www-form-urlencoded; charset=UTF-8")
 }
 
 export interface SaleItem{
@@ -384,10 +384,7 @@ export interface getSaleBySaleTransactionIdData {
 }
 
 export async function getSaleBySaleTransactionId(transactionId: string, cookies?:string):Promise<getSaleBySaleTransactionIdData>{
-    return apiRequest<getSaleBySaleTransactionIdData>("Api/CustomerAccountApi/GetSaleBySaleTransactionId", "POST", cookies, `SaleTransactionId=${transactionId}`, "application/x-www-form-urlencoded; charset=UTF-8");
-}
-export async function getAutoloadsByTransitAccountId(transitAccountId:number, cookies?:string){
-    return apiRequest<GetAutoloadsByTransitAccountIdData[]>("Api/ProductsApi/GetAutoloadsByTransitAccountId", "POST", cookies, { TransitAccountId: transitAccountId }, "application/x-www-form-urlencoded; charset=UTF-8")
+    return apiRequest<getSaleBySaleTransactionIdData>("Api/CustomerAccountApi/GetSaleBySaleTransactionId", "POST", cookies, {SaleTransactionId: transactionId}, "application/x-www-form-urlencoded; charset=UTF-8");
 }
 
 export interface GetCustomerAccountByIdFundingSourcesResult{
