@@ -6,7 +6,9 @@ import Foundation from "@expo/vector-icons/Foundation";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { HolocardAutoloadInfo, HolocardCappingInfo } from "@/types/holo";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import { HolocardAutoloadInfo, HolocardCappingInfo, Transaction, TransactionDetails } from "@/types/holo";
 
 export interface HolocardPreviewProps{
     cardName:string;
@@ -33,15 +35,47 @@ export interface HolocardBalanceProps{
     currentCaps?: HolocardCappingInfo[];
     autoloadsInfo?: HolocardAutoloadInfo[];
 }
+export interface HolocardActivities{
+    holocardActivities?:Transaction[]
+}
 
-export interface HolocardCardActivityProps{
-    activityType: string;
-    activityID:string;
-    activityName: string;
-    activityTimestamp: string;
-    activityDescription?:string;
-    activityCharge: number;
-    activityBalance: number;
+export interface HolocardActivity{
+    holocardActivity?:Transaction
+}
+
+export interface HolocardTransactionDetails{
+    holocardTransactionDetails:TransactionDetails
+}
+
+export interface HolocardCardActivityTransactionProps{
+    holocardActivityTransaction:Transaction
+}
+export interface HolocardCardActivityMainInfoProps{
+    holocardActivityTransaction:Transaction
+}
+
+export interface HolocardTransactionDetailsProps{
+    holocardTransactionDetails:TransactionDetails | null | undefined
+    holocardActivityTransaction:Transaction | null | undefined
+}
+
+export interface HolocardTransactionDetailHeaderProps{
+    Name: string;
+    Date: string;
+    Amount: number;
+    Balance:number;
+}
+
+export interface HolocardTravelDetailsProps{
+    Stop: string;
+    VehicleNumber: number;
+    Route: string;
+}
+
+export interface HolocardPaymentDetailsProps{
+    isCard?:boolean;
+    Name:string;
+    PaymentNumber: string;
 }
 
 const holocardPreviewStyle = StyleSheet.create({
@@ -77,7 +111,7 @@ export function HolocardPreview({cardName, cardType, currentBalance, currentPass
 
     return(
             <View
-                style={[cardStyles.card, {backgroundColor:"white", flexDirection:'row', padding:scale(10), gap:scale(20)}]}
+                style={[cardStyles.card, cardStyles.cardShadow, {backgroundColor:"white", flexDirection:'row', padding:scale(10), gap:scale(20)}]}
                 >
                 <Divider orientation="vertical" thickness={3} color="#D4D4D4" length={'45%'}>
                 <View style={holocardPreviewStyle.column}>
@@ -177,7 +211,7 @@ export function HolocardBalance({currentBalance, currentCaps, autoloadsInfo}:Hol
     }
 
     return(
-            <View className="flex-col px-7 py-5 gap-2.5" style={[cardStyles.card, {backgroundColor:`${Colors.HoloAccentColor}`}]}>
+            <View className="flex-col px-7 py-5 gap-2.5" style={[cardStyles.card, cardStyles.cardShadow, {backgroundColor:`${Colors.HoloAccentColor}`}]}>
                 <Text className="text-white" style={[textStyles.h1]}>Card Balance</Text>
                 <Text className="text-white" style={[textStyles.h1, textStyles.bold, {fontSize:moderateScale(96, 0.65)}]}>${(currentBalance/100).toFixed(2)}</Text>
                 {currentCaps?.map((currentCap, index)=>(
@@ -227,32 +261,197 @@ export function HolocardBalance({currentBalance, currentCaps, autoloadsInfo}:Hol
     )
 }
 
-export function HolocardCardActivity({ holocardCardActivities }: { holocardCardActivities: HolocardCardActivityProps[] }){
+export function HolocardActivityPreview({holocardActivity}: HolocardActivity){
+    
+    { if(!holocardActivity){
+        return(null)
+    }
+    const credit = "credit" in holocardActivity ? holocardActivity.credit : 0;
+    const balance = "balance" in holocardActivity ? holocardActivity.balance : 0;
+    return(     
+    <View key={holocardActivity.transactionId} className="inline-flex flex-row p-0.5 gap-1.5 my-1.5 bg-white" style={[cardStyles.card]}>
+        <HolocardCardActivityIcon holocardActivityTransaction={holocardActivity}/>
+        <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+            <HolocardCardActivityMainInfo holocardActivityTransaction={holocardActivity}/>
+        </View>
+        <View className="flex-1 flex-col justify-center items-start gap-0.5">
+            <HolocardCardActivityDescription holocardActivityTransaction={holocardActivity}/>
+        </View>
+        <View className="flex flex-col justify-start items-end gap-2.5">
+            {credit<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${((credit*-1)/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(credit/100).toFixed(2)}</Text>}
+            <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(balance/100).toFixed(2)}</Text>
+        </View>
+    </View>
+    )
+}
+}
+
+function HolocardCardActivityIcon({holocardActivityTransaction}:HolocardCardActivityMainInfoProps){
+    switch(holocardActivityTransaction.transactionType){
+        case "Boarding":
+            return <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+        case "Transfer":
+            return <MaterialCommunityIcons name="bus-multiple" size={50} color="black" />
+        case "Load":
+            return <Fontisto name="bus-ticket" size={50} color="black" />
+        case "Charge":
+            return <MaterialCommunityIcons name="cash-plus" size={50} color="black" />
+        case "Use":
+            return <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
+        case "FareMediaSale":
+            return <MaterialIcons name="add-card" size={50} color="black" />
+        case "83":
+    }
+}
+
+function HolocardCardActivityMainInfo({holocardActivityTransaction}:HolocardCardActivityMainInfoProps){
+    
+    let BaseRender = ({transactionTitle}:{transactionTitle: string;}) => (<>
+        <Text style={[textStyles.h2, textStyles.bold]}>{transactionTitle}</Text>
+        <Text style={[textStyles.h4, textStyles.bold]}>{new Date(holocardActivityTransaction.timestamp).toLocaleString('default', {dateStyle:"short", timeStyle:"short"})}</Text>
+    </>)
+
+    switch(holocardActivityTransaction.transactionType){
+        case "Boarding":
+            return(
+                <BaseRender transactionTitle={holocardActivityTransaction.transactionType}/>
+            )
+        case "Transfer":
+            return(
+                <BaseRender transactionTitle={holocardActivityTransaction.transactionType}/>
+            )
+        case "Load":
+            return(
+                <BaseRender transactionTitle="Added Pass"/>
+            )
+        case "Charge":
+            return(
+                <BaseRender transactionTitle="Reload"/>
+            )
+        case "Use":
+            return(
+                <BaseRender transactionTitle="Used Pass"/>
+            )
+        case "FareMediaSale":
+            return(
+                <BaseRender transactionTitle="Purchased Card"/>
+            )
+        case "83":
+            return
+    }
+}
+
+function HolocardCardActivityDescription({holocardActivityTransaction}:HolocardCardActivityTransactionProps){
+
+    const BaseRender = ({transactionDescription}:{transactionDescription:string;}) =>(
+        <Text numberOfLines={3} ellipsizeMode="tail" style={[textStyles.h3, textStyles.bold]}>
+                {transactionDescription}
+        </Text>
+    )
+
+    switch(holocardActivityTransaction.transactionType){
+        case "Boarding":
+            return(<BaseRender transactionDescription={`${holocardActivityTransaction.lineName} 
+Stop: ${holocardActivityTransaction.stopName}`}/>)
+        case "Transfer":
+            return(<BaseRender transactionDescription={`${holocardActivityTransaction.lineName} 
+Stop: ${holocardActivityTransaction.stopName}`}/>)
+        case "Load":
+            return(<BaseRender transactionDescription={`Loaded: ${holocardActivityTransaction.trasactionName} 
+Valid to: ${new Date(holocardActivityTransaction.validTo ?? "").toLocaleString('default', {dateStyle:'short', timeStyle:'long'})}`}/>)
+        case "Charge":
+            return
+        case "Use":
+            return(<BaseRender transactionDescription={`Used the ${holocardActivityTransaction.trasactionName} Pass 
+${holocardActivityTransaction.lineName} 
+Stop: ${holocardActivityTransaction.stopName} 
+Valid to: ${new Date(holocardActivityTransaction.validTo ?? "").toLocaleString('default', {dateStyle:'short', timeStyle:'long'})}`}/>)
+        case "FareMediaSale":
+            return(
+                <BaseRender transactionDescription={`Bought ${holocardActivityTransaction.trasactionName}`}/>
+            )
+        case "83":
+            return
+    }
+}
+
+export function HolocardTransactionDetails({holocardTransactionDetails, holocardActivityTransaction}:HolocardTransactionDetailsProps){
     return(
-        <View className="flex flex-col gap-3">
+        <View style={[cardStyles.card, cardStyles.cardShadow]} className="flex-col gap-3 !p-3 bg-white">{
+        holocardTransactionDetails ? holocardTransactionDetails.ItemDetails.map((itemDetail, index) => (
+            <>
                 <View className="flex-row justify-between">
-                    <Text className="text-white" style={[textStyles.h1, textStyles.bold]}>Card Activity</Text>
-                    <Pressable>
-                        <Text className="text-white" style={[textStyles.h1]}>See All</Text>
-                    </Pressable>
+                    <HolocardTransactionDetailHeader Name={itemDetail.ItemName} Date={holocardTransactionDetails.Timestamp} Amount={itemDetail.Price} Balance={itemDetail.CardBalanceAfter}/>
                 </View>
-                {/**Card Activity Card Component*/} 
-                {holocardCardActivities.map((holocardCardActivity, index)=> (
-                    <View key={index} className="flex flex-row p-2.5 gap-2.5 bg-white" style={[cardStyles.card]}>
-                        <FontAwesome6 name="person-walking-luggage" size={50} color="black" />
-                        <View className="flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-                            <Text style={[textStyles.h1, textStyles.bold]}>{holocardCardActivity.activityName}</Text>
-                            <Text style={[textStyles.h3, textStyles.bold]}>{holocardCardActivity.activityTimestamp}</Text>
-                        </View>
-                        <View className="flex-1 flex-col justify-center items-start gap-2.5">
-                            <Text style={[textStyles.h3, textStyles.bold,]}>{holocardCardActivity.activityDescription}</Text>
-                        </View>
-                        <View className="flex flex-col justify-start items-end gap-2.5">
-                            {holocardCardActivity.activityCharge<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>}
-                            <Text style={[textStyles.h3, textStyles.bold,]}>Balance: ${(holocardCardActivity.activityBalance/100).toFixed(2)}</Text>
-                        </View>
-                    </View>
-                ))}
+                <View className="flex-col">
+                    {(holocardTransactionDetails.PaymentDetails.length) ?
+                    holocardTransactionDetails.PaymentDetails.map((paymentDetail, index)=>
+                    <HolocardPaymentDetails PaymentNumber={paymentDetail.CreditCardNumber} Name="" isCard={paymentDetail.PaymentMethod === 2? true : false}/>
+                    ):(holocardActivityTransaction?.transactionType === "Boarding"?<HolocardTravelDetails VehicleNumber={holocardActivityTransaction.vehicleNumber} Stop={holocardActivityTransaction.stopName} Route={holocardActivityTransaction.lineName}/>: <></>)
+                    }
+                </View>
+            </>
+        )): holocardActivityTransaction?.transactionType === "Boarding"?<HolocardTravelDetails VehicleNumber={holocardActivityTransaction.vehicleNumber} Stop={holocardActivityTransaction.stopName} Route={holocardActivityTransaction.lineName}/>: <></>}
+        </View>
+    )
+}
+
+function HolocardTransactionDetailHeader({Name, Date: date, Amount, Balance}:HolocardTransactionDetailHeaderProps){
+    return(
+        <>
+            {/** Transaction Name & Date */}
+                <View className="flex-col">
+                    <Text style={[textStyles.h1, textStyles.bold]}>{Name}</Text>
+                    <Text style={[textStyles.h2, textStyles.bold]}>{new Date(date).toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric', timeStyle:"short"} )}</Text>
+                </View>
+                {/** Transaction Amount & Balance */}
+                <View className="flex-col">
+                    <Text className="text-right" style={[textStyles.h1, textStyles.bold]}>{Amount<0?<Text style={[textStyles.h1, {color: "#8F0000"}]}>-${((Amount*-1)/100).toFixed(2)}</Text>:<Text style={[textStyles.h1, {color: "#058F00"}]}>+${(Amount/100).toFixed(2)}</Text>}</Text>
+                    <Text className="text-right" style={[textStyles.h2, textStyles.bold]}>Balance: ${(Balance/100).toFixed(2)}</Text>
+                </View>
+        </>
+    )
+}
+
+function HolocardTravelDetails({Route, Stop, VehicleNumber}:HolocardTravelDetailsProps){
+    return(
+        <>
+            {/* <Map></Map> Add a pin in a google map of this location*/}
+            <Text style={[textStyles.h2]}>Stop: {Stop}</Text>
+            <Text style={[textStyles.h2]}>Vehicle #: {VehicleNumber}</Text>
+            <Text style={[textStyles.h2]}>Route: {Route}</Text>
+        </>
+    )
+}
+
+function HolocardPaymentDetails({Name, isCard, PaymentNumber}:HolocardPaymentDetailsProps){
+    return(
+        <View className="flex-col">
+            {isCard ? <HolocardCardPaymentDetails Name={Name} PaymentNumber={PaymentNumber}/> : <HolocardACHPaymentDetails Name={Name} PaymentNumber={PaymentNumber}/>}
+        </View>
+    )
+}
+
+function HolocardCardPaymentDetails({Name, PaymentNumber}:HolocardPaymentDetailsProps){
+    return(
+        <View className="p-3 gap-2 flex-col rounded-xl border-black border-8 bg-white">
+            <View className="flex-row justify-between"> 
+                <Text style={[textStyles.h1, textStyles.bold]}>{Name}</Text>
+                <Image className="w-12 h-12" source={{uri: "https://img.icons8.com/?size=100&id=106551&format=png&color=000000"}}/>
             </View>
+            <Image className="w-12 h-12" source={{uri: "https://img.icons8.com/?size=100&id=3559&format=png&color=000000"}}/>
+            <Text className="text-center" style={[textStyles.h1, textStyles.bold]}>{PaymentNumber}</Text>
+            <Image className="w-12 h-12"/>
+        </View>
+    )
+}
+
+function HolocardACHPaymentDetails({Name, PaymentNumber}:HolocardPaymentDetailsProps){
+    return(
+        <View className="flex-col p-3 gap-1">
+            <Text className="text-center" style={[textStyles.h1, textStyles.bold]}>{Name}</Text>
+            <Image className="w-full aspect-square" source={{uri: "https://img.icons8.com/?size=500&id=77054&format=png&color=000000"}}/>
+            <Text className="text-center" style={[textStyles.h1, textStyles.bold]}>{PaymentNumber}</Text>
+        </View>
     )
 }
