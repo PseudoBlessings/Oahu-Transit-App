@@ -415,3 +415,52 @@ export async function getCanAddPaymentMethods(cookies?:string):Promise<boolean>{
     return apiRequest<boolean>("api/CustomerAccountApi/GetCanAddPaymentMethods", "POST", cookies, undefined, "application/x-www-form-urlencoded; charset=UTF-8")
 }
 
+export interface PostAddCardValueToShoppingCartDataCardHolderID{
+}
+export interface PostAddCardValueToShoppingCartDataParticipantID{
+    "Id": string,
+    "CartItemId": string,
+    "ParticipantId": number,
+    "DateCreated": string,
+    "DateModified": string
+}
+export interface PostAddCardValueToShoppingCartDataProducts{
+    "Id": string,
+    "CartItemId": string,
+    "Quantity": number,
+    "Price": number,
+    "DateCreated": string,
+    "DateModified": string,
+    "ProductId": number,
+    "FareProduct": null,
+    "ValidFrom": string|null,
+    "ValidTo": string|null,
+    "ValidityGroup": null,
+    "GroupSize": number|null,
+    "CardholderId": number|null,
+    "VanpoolGroupId": number|null,
+    "Notes": string|null
+}
+export interface PostAddCardValueToShoppingCartData{
+    "Id": string,
+    "CartId": string,
+    "Quantity": number,
+    "Price": number|null,
+    "DateCreated": string,
+    "DateModified": string,
+    "ProductId": number|null,
+    "FareProduct": number|null,
+    "FareMediaTypeId": number|null,
+    "FareMediaId": string|null,
+    "FareMedia": string|null,
+    "PrintedCardNumber": string,
+    "Products": PostAddCardValueToShoppingCartDataProducts[] | null,
+    "ParticipantIds":PostAddCardValueToShoppingCartDataParticipantID[],
+    "CardHolderIds":PostAddCardValueToShoppingCartDataCardHolderID[] | null,
+    "ReplacedCardNumber": string|null,
+    "ReplacementMediaTypeId": number|null,
+    "AssociationType": number
+}
+
+export async function PostAddCardValueToShoppingCart(transitAccountId:number, amount:number, __RequestVerificationToken:string, cookies?:string):Promise<PostAddCardValueToShoppingCartData>{
+    return apiRequest<PostAddCardValueToShoppingCartData>("Api/ShoppingCartApi/PostAddCardValueToShoppingCart", "POST", cookies, {TransitAccountID: transitAccountId , Amount: amount}, "application/x-www-form-urlencoded; charset=UTF-8", __RequestVerificationToken)}
