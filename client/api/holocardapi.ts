@@ -5,16 +5,48 @@ export interface APIResponse<APIResponseDataType>{
     Success: boolean;
 }
 
+function appendFormValue(
+    searchParams: URLSearchParams,
+    key: string,
+    value: unknown
+): void {
+    if (value === undefined) return;
+
+    if (value === null) {
+        searchParams.append(key, "");
+        return;
+    }
+
+    if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+            appendFormValue(searchParams, `${key}[${index}]`, item);
+        });
+        return;
+    }
+
+    if (typeof value === "object") {
+        for (const [nestedKey, nestedValue] of Object.entries(value)) {
+            appendFormValue(searchParams, `${key}[${nestedKey}]`, nestedValue);
+        }
+        return;
+    }
+
+    searchParams.append(key, String(value));
+}
+
 async function apiRequest<APIResponseDataType>(endpoint: string, httpMethod:"GET"|"POST", cookies?: string, params?:Record<string, string | number | undefined>, contentType?:string, requestVerficationToken?:string):Promise<APIResponseDataType>{
     let body:string | null = null;
     if (params) {
         const searchParams = new URLSearchParams();
+
         for (const [key, value] of Object.entries(params)) {
-            if (value !== undefined && value !== null) searchParams.set(key, String(value));
+            appendFormValue(searchParams, key, value);
         }
+
         if (requestVerficationToken) {
             searchParams.set("__RequestVerificationToken", requestVerficationToken);
         }
+
         body = searchParams.toString();
     }
 
@@ -464,3 +496,79 @@ export interface PostAddCardValueToShoppingCartData{
 
 export async function PostAddCardValueToShoppingCart(transitAccountId:number, amount:number, __RequestVerificationToken:string, cookies?:string):Promise<PostAddCardValueToShoppingCartData>{
     return apiRequest<PostAddCardValueToShoppingCartData>("Api/ShoppingCartApi/PostAddCardValueToShoppingCart", "POST", cookies, {TransitAccountID: transitAccountId , Amount: amount}, "application/x-www-form-urlencoded; charset=UTF-8", __RequestVerificationToken)}
+
+export async function DeleteItem(id:string, products:PostAddCardValueToShoppingCartDataProducts[], __RequestVerificationToken:string, cookies?:string):Promise<String>{
+    return apiRequest<String>("Api/ShoppingCartApi/DeleteItem", "POST", cookies, {Id: id, Products: JSON.stringify(products)}, "application/x-www-form-urlencoded; charset=UTF-8", __RequestVerificationToken)}
+
+export interface GetShoppingCartItemsParticipantIds{
+    Id:string,
+    CartItemId:string,
+    ParticipantId:number,
+    DateCreated:string,
+    DateModified:string
+}
+export interface GetShoppingCartItemsProducts{
+Id:string,
+CartItemId:string,
+Quantity:number,
+Price:number,
+DateCreated:string,
+DateModified:string,
+ProductId:number,
+FareProduct:string | null,
+ValidFrom:string | null,
+ValidTo:string | null,
+ValidityGroup:number | null,
+GroupSize:number | null,
+CardholderId:string | null,
+VanpoolGroupId: string | null,
+Notes:string | null
+}
+
+export interface GetShoppingCartItems{
+    Id:string,
+    CartId:string,
+    Quantity:number,
+    Price:number | null,
+    DateCreated:string,
+    DateModified:string,
+    ProductId:string | null,
+    FareProduct: string | null,
+    FareMediaTypeId: number | null,
+    FareMediaId: string,
+    FareMedia: string | null,
+    PrintedCardNumber: string,
+    Products:GetShoppingCartItemsProducts,
+    ParticipantIds: GetShoppingCartItemsParticipantIds,
+    CardHolderIds:any[],
+    ReplacedCardNumber:null,
+    ReplacementMediaTypeId:null,
+    AssociationType:number
+}
+export interface GetShoppingCartData{
+    Id:string,
+    UserId:number,
+    InstitutionUserId:number,
+    SuperUserId:number,
+    InstitutionId:number,
+    ShippingAddressId:number,
+    DateCreated:string,
+    DateUpdated:string,
+    Items:GetShoppingCartItems[]
+    FundingSources:any[],
+    FailedProcessing:boolean,
+    ErrorMessage:string | null,
+    IsBulkSale:boolean,
+    BulkCsv:string,
+    JobId:number,
+    ParticipantGroupId:string | null,
+    IsPreTax:boolean | null,
+    Notes:string | null,
+    InvoiceNumber:string | null,
+    ContactData:any | null,
+    ShippingAddress:string | null
+}
+
+
+export async function GetShoppingCart(cookies?:string):Promise<GetShoppingCartData>{
+    return apiRequest<GetShoppingCartData>("api/ShoppingCartApi/GetShoppingCart", "GET", cookies, undefined, "application/json; charset=utf-8")}
